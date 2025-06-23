@@ -8,12 +8,29 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "android": {
+      "package": "com.skivelane.flashwave",
+      "versionCode": 1,
+      "permissions": [
+        "CAMERA",
+        "VIBRATE",
+        "WAKE_LOCK",
+        "SYSTEM_ALERT_WINDOW"
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#000000"
+      }
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.skivelane.flashwave",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
-      }
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "Flashwave needs camera access to control the flashlight for the strobe effects.",
+        "UIViewControllerBasedStatusBarAppearance": true
+      },
+      "buildNumber": "1.0.0"
     },
     "web": {
       "bundler": "metro",
@@ -23,7 +40,14 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Flashwave needs camera access to control the flashlight for the strobe effects."
+        }
+      ],
+      "expo-brightness"
     ],
     "experiments": {
       "typedRoutes": true

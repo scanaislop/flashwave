@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  ViewStyle,
-  TextStyle,
-  Platform,
-} from 'react-native';
+import { Platform, StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 
@@ -27,7 +20,7 @@ export default function GlowButton({
   size = 'medium',
   style,
   textStyle,
-  disabled = false,
+  disabled = false
 }: GlowButtonProps) {
   const handlePress = () => {
     if (Platform.OS !== 'web') {
@@ -38,7 +31,7 @@ export default function GlowButton({
 
   const getGradientColors = () => {
     if (disabled) return ['#64748B', '#475569'];
-    
+
     switch (variant) {
       case 'primary':
         return ['#06FFA5', '#059669'];
@@ -73,29 +66,22 @@ export default function GlowButton({
     }
   };
 
-  return (
-    <TouchableOpacity
-      onPress={handlePress}
-      disabled={disabled}
-      style={[styles.container, getSizeStyles(), style]}
-      activeOpacity={0.8}>
-      <LinearGradient
-        colors={getGradientColors()}
-        style={styles.gradient}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}>
-        <Text
-          style={[
-            styles.text,
-            { fontSize: getTextSize() },
-            disabled && styles.disabledText,
-            textStyle,
-          ]}>
-          {title}
-        </Text>
-      </LinearGradient>
-    </TouchableOpacity>
-  );
+  return (<TouchableOpacity
+    onPress={handlePress}
+    disabled={disabled}
+    style={[styles.container, getSizeStyles(), style]}
+    activeOpacity={0.8}>
+    <LinearGradient
+      colors={getGradientColors() as any}
+      style={styles.gradient}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}>
+      <Text
+        style={[styles.text, { fontSize: getTextSize() }, disabled && styles.disabledText, textStyle]}>
+        {title}
+      </Text>
+    </LinearGradient>
+  </TouchableOpacity>);
 }
 
 const styles = StyleSheet.create({
@@ -106,21 +92,12 @@ const styles = StyleSheet.create({
     shadowColor: '#06FFA5',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
-    shadowRadius: 8,
-  },
-  gradient: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 12,
-  },
-  text: {
-    color: '#FFFFFF',
-    fontFamily: 'Rajdhani-Bold',
-    textAlign: 'center',
-    letterSpacing: 0.5,
-  },
-  disabledText: {
-    color: '#9CA3AF',
-  },
+    shadowRadius: 8
+  }, gradient: {
+    flex: 1, justifyContent: 'center', alignItems: 'center', borderRadius: 12
+  }, text: {
+    color: '#FFFFFF', fontFamily: 'Rajdhani-Bold', textAlign: 'center', letterSpacing: 0.5
+  }, disabledText: {
+    color: '#9CA3AF'
+  }
 });

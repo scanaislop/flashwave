@@ -74,7 +74,6 @@ export const strobeColors = [
   { name: 'White', color: '#FFFFFF', secondary: '#E5E7EB' },
   { name: 'Red', color: '#EF4444', secondary: '#F97316' },
   { name: 'Rainbow', color: '#FF0080', secondary: '#00FF80' },
-  { name: 'White', color: '#FFFFFF' , secondary: '#E5E7EB' },
   { name: 'Orange', color: '#F59E0B' , secondary: '#F59E0B' },
 ];
 

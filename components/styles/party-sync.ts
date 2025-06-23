@@ -32,10 +32,7 @@ export const partySyncStyles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
   },
-  hostContainer: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
+
   hostHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -54,9 +51,6 @@ export const partySyncStyles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
     lineHeight: 20,
-  },
-  hostButton: {
-    width: '100%',
   },
   divider: {
     flexDirection: 'row',

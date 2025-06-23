@@ -201,6 +201,7 @@ export const strobeStyles = StyleSheet.create({
       flexDirection: 'row',
       justifyContent: 'center',
       gap: 12,
+      flexWrap: 'wrap',
     },
     colorItem: {
       width: 36,

@@ -67,7 +67,7 @@ export default function PartySyncScreen() {
           </View>
 
           <ScrollView style={partySyncStyles.content} showsVerticalScrollIndicator={false}>
-            <NeonContainer style={partySyncStyles.hostContainer} glowColor="#06FFA5">
+            <NeonContainer glowColor="#06FFA5">
               <View style={partySyncStyles.hostHeader}>
                 <Crown size={24} color="#06FFA5" />
                 <Text style={partySyncStyles.hostTitle}>Host a Party</Text>
@@ -80,7 +80,6 @@ export default function PartySyncScreen() {
                 onPress={createPartyRoom}
                 variant="primary"
                 size="medium"
-                style={partySyncStyles.hostButton}
               />
             </NeonContainer>
 

@@ -154,7 +154,7 @@ export default function ManualStrobeScreen() {
             </View>
           </NeonContainer>)}
 
-          <NeonContainer style={manualStyles.colorContainer}>
+          <NeonContainer>
             <Text style={manualStyles.colorTitle}>Flash Color</Text>
             <View style={manualStyles.colorGrid}>
               {strobeColors.map((color, index) => (<TouchableOpacity

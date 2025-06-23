@@ -55,7 +55,8 @@ export const strobeStyles = StyleSheet.create({
     },
     controlsOverlay: {
       ...StyleSheet.absoluteFillObject,
-      backgroundColor: 'rgba(0, 0, 0, 0.4)',
+      backgroundColor: 'transparent',
+      zIndex: 10, // Ensure controls are above the effects
     },
     header: {
       flexDirection: 'row',

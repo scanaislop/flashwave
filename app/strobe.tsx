@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert, Animated, Platform, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -16,6 +17,18 @@ import { ColorSelection } from '@/components/strobe/ColorSelection';
 import { StrobeEffects } from '@/components/strobe/StrobeEffects';
 import { ToggleControlsIcon } from '@/components/strobe/ToggleControlsIcon';
 
+interface StrobeSettings {
+  isStrobing: boolean;
+  strobeSpeed: number;
+  selectedColor: number;
+  selectedEffect: number;
+  sustainedMode: boolean;
+  flashlightEnabled: boolean;
+  screenBrightness: number;
+}
+
+const STORAGE_KEY = '@flashwave_strobe_settings';
+
 export default function StrobeScreen() {
   const [isStrobing, setIsStrobing] = useState(false);
   const [strobeSpeed, setStrobeSpeed] = useState(0.5);
@@ -28,7 +41,8 @@ export default function StrobeScreen() {
   const [originalBrightness, setOriginalBrightness] = useState(1.0);
   const [torchAvailable, setTorchAvailable] = useState(false);
   const [currentColorIndex, setCurrentColorIndex] = useState(0);
-
+  const [isInitialized, setIsInitialized] = useState(false);
+  
   const flashAnimation = useRef(new Animated.Value(0)).current;
   const sustainedAnimation = useRef(new Animated.Value(0)).current;
   const waveAnimation = useRef(new Animated.Value(0)).current;
@@ -38,12 +52,142 @@ export default function StrobeScreen() {
   const colorCycleAnimation = useRef(new Animated.Value(0)).current;
   const colorCycleLoopRef = useRef<Animated.CompositeAnimation | null>(null);
 
-  const strobeInterval = useRef(null);
-  const flashlightInterval = useRef(null);
-  const hideControlsTimeout = useRef(null);
+  const strobeInterval = useRef<NodeJS.Timeout | null>(null);
+  const flashlightInterval = useRef<NodeJS.Timeout | null>(null);
+  const hideControlsTimeout = useRef<NodeJS.Timeout | null>(null);
+  const isMounted = useRef(true);
+
+  const hideControls = useCallback(() => {
+    Animated.parallel([Animated.timing(controlsOpacity, {
+      toValue: 0, duration: 300, useNativeDriver: true
+    }), Animated.timing(toggleIconOpacity, {
+      toValue: 1, duration: 500, useNativeDriver: true
+    })]).start(() => {
+      setShowControls(false);
+    });
+  }, [controlsOpacity, toggleIconOpacity]);
+
+  const showControlsPermanently = useCallback(() => {
+    setShowControls(true);
+    Animated.parallel([Animated.timing(controlsOpacity, {
+      toValue: 1, duration: 200, useNativeDriver: true
+    }), Animated.timing(toggleIconOpacity, {
+      toValue: 0, duration: 200, useNativeDriver: true
+    })]).start();
+    if (hideControlsTimeout.current) {
+      clearTimeout(hideControlsTimeout.current);
+    }
+  }, [controlsOpacity, toggleIconOpacity]);
+
+  const showControlsTemporarily = useCallback(() => {
+    setShowControls(true);
+    Animated.parallel([Animated.timing(controlsOpacity, {
+      toValue: 1, duration: 200, useNativeDriver: true
+    }), Animated.timing(toggleIconOpacity, {
+      toValue: 0, duration: 200, useNativeDriver: true
+    })]).start();
+    
+    // Clear existing timer
+    if (hideControlsTimeout.current) {
+      clearTimeout(hideControlsTimeout.current);
+    }
+    
+    // Only set auto-hide timer if strobing
+    if (isStrobing) {
+      hideControlsTimeout.current = setTimeout(() => {
+        hideControls();
+      }, 3000) as unknown as NodeJS.Timeout;
+    }
+  }, [controlsOpacity, toggleIconOpacity, isStrobing, hideControls]);
+
+  // Load saved settings from AsyncStorage
+  const loadSettings = useCallback(async () => {
+    try {
+      const savedSettings = await AsyncStorage.getItem(STORAGE_KEY);
+      if (savedSettings) {
+        const settings: StrobeSettings = JSON.parse(savedSettings);
+        if (isMounted.current) {
+          setStrobeSpeed(settings.strobeSpeed);
+          setSelectedColor(settings.selectedColor);
+          setSelectedEffect(settings.selectedEffect);
+          setSustainedMode(settings.sustainedMode);
+          setFlashlightEnabled(settings.flashlightEnabled);
+          setScreenBrightness(settings.screenBrightness);
+          
+          // Start strobing if it was active
+          if (settings.isStrobing) {
+            setIsStrobing(true);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load settings', error);
+    } finally {
+      if (isMounted.current) {
+        setIsInitialized(true);
+      }
+    }
+  }, []);
+
+  // Save settings to AsyncStorage whenever they change
+  const saveSettings = useCallback(async () => {
+    if (!isInitialized) return;
+    
+    const settings: StrobeSettings = {
+      isStrobing,
+      strobeSpeed,
+      selectedColor,
+      selectedEffect,
+      sustainedMode,
+      flashlightEnabled,
+      screenBrightness,
+    };
+
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    } catch (error) {
+      console.error('Failed to save settings', error);
+    }
+  }, [isStrobing, strobeSpeed, selectedColor, selectedEffect, sustainedMode, flashlightEnabled, screenBrightness, isInitialized]);
+
+  // Load settings on mount
+  useEffect(() => {
+    loadSettings();
+    return () => {
+      isMounted.current = false;
+    };
+  }, [loadSettings]);
+
+  // Save settings when they change
+  useEffect(() => {
+    if (!isInitialized) return;
+    
+    const saveTimeout = setTimeout(() => {
+      saveSettings();
+    }, 500); // Debounce to avoid too many saves
+    
+    return () => clearTimeout(saveTimeout);
+  }, [saveSettings, isInitialized, isStrobing, strobeSpeed, selectedColor, selectedEffect, sustainedMode, flashlightEnabled, screenBrightness]);
+
+  // Initialize and cleanup
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+      // Cleanup intervals and timeouts
+      if (strobeInterval.current) clearInterval(strobeInterval.current);
+      if (flashlightInterval.current) clearInterval(flashlightInterval.current);
+      if (hideControlsTimeout.current) clearTimeout(hideControlsTimeout.current);
+    };
+  }, []);
+  
+  // Handle screen tap to show controls
+  const handleScreenTap = useCallback(() => {
+    if (!showControls) {
+      showControlsTemporarily();
+    }
+  }, [showControls, showControlsTemporarily]);
 
   useEffect(() => {
-    let isMounted = true;
     const initializeHardware = async () => {
       if (Platform.OS === 'web') return;
       try {
@@ -82,7 +226,7 @@ export default function StrobeScreen() {
     initializeHardware();
 
     return () => {
-      isMounted = false;
+      isMounted.current = false;
       if (Platform.OS !== 'web') {
         Brightness.setBrightnessAsync(originalBrightness);
         if (torchAvailable) {
@@ -91,6 +235,10 @@ export default function StrobeScreen() {
           }
         }
       }
+      // Clear intervals and timeouts
+      if (strobeInterval.current) clearInterval(strobeInterval.current);
+      if (flashlightInterval.current) clearInterval(flashlightInterval.current);
+      if (hideControlsTimeout.current) clearTimeout(hideControlsTimeout.current);
     };
   }, []);
 
@@ -110,28 +258,13 @@ export default function StrobeScreen() {
       colorCycleLoopRef.current = loop;
     }
 
-    if (isStrobing && showControls) {
-      hideControlsTimeout.current = setTimeout(() => {
-        hideControls();
-      }, 3000) as any;
-    }
-
     return () => {
       waveLoop.stop();
       if (colorCycleLoopRef.current) {
         colorCycleLoopRef.current.stop();
       }
-      if (strobeInterval.current) {
-        clearInterval(strobeInterval.current);
-      }
-      if (flashlightInterval.current) {
-        clearInterval(flashlightInterval.current);
-      }
-      if (hideControlsTimeout.current) {
-        clearTimeout(hideControlsTimeout.current);
-      }
     };
-  }, [selectedColor, isStrobing, showControls]);
+  }, [selectedColor]);
 
   const handleBrightnessChange = async (value: number) => {
     if (Platform.OS === 'web') {
@@ -300,78 +433,43 @@ export default function StrobeScreen() {
     sustainedAnimation.setValue(0);
   };
 
-  const toggleStrobe = () => {
-    setIsStrobing(!isStrobing);
+  const startStrobing = useCallback(() => {
     if (!isStrobing) {
+      setIsStrobing(true);
       showControlsTemporarily();
-    } else {
+    }
+  }, [isStrobing, showControlsTemporarily]);
+
+  const stopStrobing = useCallback(() => {
+    if (isStrobing) {
+      setIsStrobing(false);
       showControlsPermanently();
     }
-  };
+  }, [isStrobing, showControlsPermanently]);
 
-  const showControlsTemporarily = () => {
-    setShowControls(true);
-    Animated.parallel([Animated.timing(controlsOpacity, {
-      toValue: 1, duration: 200, useNativeDriver: true
-    }), Animated.timing(toggleIconOpacity, {
-      toValue: 0, duration: 200, useNativeDriver: true
-    })]).start();
-    if (hideControlsTimeout.current) {
-      clearTimeout(hideControlsTimeout.current);
-    }
-    hideControlsTimeout.current = setTimeout(() => {
-      hideControls();
-    }, 3000) as any;
-  };
-
-  const showControlsPermanently = () => {
-    setShowControls(true);
-    Animated.parallel([Animated.timing(controlsOpacity, {
-      toValue: 1, duration: 200, useNativeDriver: true
-    }), Animated.timing(toggleIconOpacity, {
-      toValue: 0, duration: 200, useNativeDriver: true
-    })]).start();
-    if (hideControlsTimeout.current) {
-      clearTimeout(hideControlsTimeout.current);
-    }
-  };
-
-  const hideControls = () => {
-    Animated.parallel([Animated.timing(controlsOpacity, {
-      toValue: 0, duration: 300, useNativeDriver: true
-    }), Animated.timing(toggleIconOpacity, {
-      toValue: 1, duration: 500, useNativeDriver: true
-    })]).start(() => {
-      setShowControls(false);
-    });
-  };
-
-  const handleScreenTap = () => {
-    if (isStrobing && !showControls) {
-      showControlsTemporarily();
-    }
-  };
-
-  const handleToggleControls = () => {
+  const handleToggleControls = useCallback(() => {
     if (showControls) {
       hideControls();
     } else {
       showControlsTemporarily();
     }
-  };
+  }, [showControls, hideControls, showControlsTemporarily]);
 
-  const handleBack = async () => {
-    setIsStrobing(false);
-    if (Platform.OS !== 'web') {
-      try {
-        await Brightness.setBrightnessAsync(originalBrightness);
-      } catch (error) {
-        console.log('Error restoring brightness:', error);
+  const handleBack = useCallback(async () => {
+    // Only allow going back if not strobing
+    if (!isStrobing) {
+      setIsStrobing(false);
+      if (Platform.OS !== 'web') {
+        try {
+          await Brightness.setBrightnessAsync(originalBrightness);
+        } catch (error) {
+          console.log('Error restoring brightness:', error);
+        }
       }
+      stopFlashlightStrobe();
+      router.back();
     }
-    stopFlashlightStrobe();
-    router.back();
-  };
+  }, [isStrobing, originalBrightness, stopFlashlightStrobe]);
 
   const getCurrentColor = () => {
     if (selectedColor === 6) {
@@ -382,6 +480,7 @@ export default function StrobeScreen() {
 
   const currentColor = getCurrentColor();
 
+  // MAIN STROBE CONTROL - Only starts/stops when isStrobing changes
   useEffect(() => {
     if (isStrobing) {
       startStrobeEffect();
@@ -396,46 +495,117 @@ export default function StrobeScreen() {
       stopSustainedEffect();
       stopFlashlightStrobe();
     }
-  }, [isStrobing, strobeSpeed, selectedEffect, sustainedMode, flashlightEnabled]);
+  }, [isStrobing]);
 
-  return (<View style={strobeStyles.container}>
-    <StatusBar hidden />
-    <LinearGradient colors={['#000000', '#0A0A0F', '#000000']} style={StyleSheet.absoluteFillObject} />
-    <StrobeEffects
-      currentColor={currentColor}
-      waveAnimation={waveAnimation}
-      burstAnimation={burstAnimation}
-      flashAnimation={flashAnimation}
-      sustainedAnimation={sustainedAnimation}
-      sustainedMode={sustainedMode}
-    />
-    <ToggleControlsIcon toggleIconOpacity={toggleIconOpacity} currentColor={currentColor}
-      handleToggleControls={handleToggleControls} />
-    {showControls && (<Animated.View style={[strobeStyles.controlsOverlay, { opacity: controlsOpacity }]}>
-      <Header handleBack={handleBack} handleToggleControls={handleToggleControls} />
-      <CenterControls isStrobing={isStrobing} currentColor={currentColor} toggleStrobe={toggleStrobe} />
-      <View style={strobeStyles.bottomControls}>
-        <HardwareControls
-          flashlightEnabled={flashlightEnabled}
-          screenBrightness={screenBrightness}
+  useEffect(() => {
+    if (isStrobing) {
+      startStrobeEffect();
+    }
+  }, [strobeSpeed, selectedEffect]);
+
+  // Handle sustained mode changes
+  useEffect(() => {
+    if (isStrobing) {
+      if (sustainedMode) {
+        startSustainedEffect();
+      } else {
+        stopSustainedEffect();
+      }
+    }
+  }, [sustainedMode]);
+
+  // Handle flashlight changes
+  useEffect(() => {
+    if (isStrobing) {
+      if (flashlightEnabled) {
+        startFlashlightStrobe();
+      } else {
+        stopFlashlightStrobe();
+      }
+    }
+  }, [flashlightEnabled]);
+
+  return (
+    <View style={[strobeStyles.container, { backgroundColor: '#000000' }]}>
+      <StatusBar hidden />
+      <LinearGradient 
+        colors={['#000000', '#0A0A0F', '#000000']} 
+        style={[StyleSheet.absoluteFillObject, { zIndex: 0 }]} 
+      />
+      <View style={[StyleSheet.absoluteFillObject, { zIndex: 1 }]}>
+        <StrobeEffects
           currentColor={currentColor}
-          torchAvailable={torchAvailable}
-          toggleFlashlight={toggleFlashlight}
-          handleBrightnessChange={handleBrightnessChange}
+          waveAnimation={waveAnimation}
+          burstAnimation={burstAnimation}
+          flashAnimation={flashAnimation}
+          sustainedAnimation={sustainedAnimation}
+          sustainedMode={sustainedMode}
         />
-        <SpeedControl strobeSpeed={strobeSpeed} currentColor={currentColor} setStrobeSpeed={setStrobeSpeed} />
-        <EffectSelection selectedEffect={selectedEffect} currentColor={currentColor}
-          setSelectedEffect={setSelectedEffect} />
-        <SustainedModeToggle sustainedMode={sustainedMode} currentColor={currentColor}
-          setSustainedMode={setSustainedMode} />
-        <ColorSelection selectedColor={selectedColor} setSelectedColor={setSelectedColor}
-          strobeColors={strobeColors} />
       </View>
-    </Animated.View>)}
-    {!showControls && (<TouchableOpacity
-      style={StyleSheet.absoluteFillObject}
-      onPress={handleScreenTap}
-      activeOpacity={1}
-    />)}
-  </View>);
+      
+      {/* Controls Layer */}
+      <View style={[StyleSheet.absoluteFillObject, { zIndex: 2 }]} pointerEvents="box-none">
+        <ToggleControlsIcon 
+          toggleIconOpacity={toggleIconOpacity} 
+          currentColor={currentColor}
+          handleToggleControls={handleToggleControls} 
+        />
+        
+        {showControls && (
+          <Animated.View 
+            style={[
+              StyleSheet.absoluteFillObject, 
+              { 
+                opacity: controlsOpacity,
+                backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                zIndex: 10
+              }
+            ]}
+            pointerEvents="box-none"
+          >
+            <Header handleBack={handleBack} handleToggleControls={handleToggleControls} />
+            <CenterControls 
+              isStrobing={isStrobing} 
+              currentColor={currentColor} 
+              toggleStrobe={isStrobing ? stopStrobing : startStrobing} 
+            />
+            <View style={strobeStyles.bottomControls}>
+              <HardwareControls
+                flashlightEnabled={flashlightEnabled}
+                screenBrightness={screenBrightness}
+                currentColor={currentColor}
+                torchAvailable={torchAvailable}
+                toggleFlashlight={toggleFlashlight}
+                handleBrightnessChange={handleBrightnessChange}
+              />
+              <SpeedControl strobeSpeed={strobeSpeed} currentColor={currentColor} setStrobeSpeed={setStrobeSpeed} />
+              <EffectSelection 
+                selectedEffect={selectedEffect} 
+                currentColor={currentColor}
+                setSelectedEffect={setSelectedEffect} 
+              />
+              <SustainedModeToggle 
+                sustainedMode={sustainedMode} 
+                currentColor={currentColor}
+                setSustainedMode={setSustainedMode} 
+              />
+              <ColorSelection 
+                selectedColor={selectedColor} 
+                setSelectedColor={setSelectedColor}
+                strobeColors={strobeColors} 
+              />
+            </View>
+          </Animated.View>
+        )}
+        
+        {!showControls && (
+          <TouchableOpacity
+            style={[StyleSheet.absoluteFillObject, { zIndex: 5 }]}
+            onPress={handleScreenTap}
+            activeOpacity={1}
+          />
+        )}
+      </View>
+    </View>
+  );
 }

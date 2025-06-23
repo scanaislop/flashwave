@@ -14,13 +14,13 @@ export const settingsStyles = StyleSheet.create({
     }, content: {
         flex: 1, paddingHorizontal: 20
     }, section: {
-        marginBottom: 20
+        marginBottom: 10
     }, sectionHeader: {
-        flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16
+        flexDirection: 'row', gap: 8
     }, sectionTitle: {
-        fontSize: 18, fontFamily: 'Rajdhani-Bold', color: '#FFFFFF', marginBottom: 16
+        fontSize: 18, fontFamily: 'Rajdhani-Bold', color: '#FFFFFF', marginBottom: 8
     }, settingItem: {
-        marginBottom: 20
+        marginBottom: 10
     }, settingRow: {
         flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8
     }, settingLabel: {

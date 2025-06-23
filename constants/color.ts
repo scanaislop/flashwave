@@ -75,6 +75,8 @@ export const strobeColors = [
   { name: 'Red', color: '#EF4444', secondary: '#F97316' },
   { name: 'Rainbow', color: '#FF0080', secondary: '#00FF80' },
   { name: 'Orange', color: '#F59E0B' , secondary: '#F59E0B' },
+  { name: 'Green', color: '#6bff00', secondary: '#6bff00' },
+  { name: 'Red', color: '#ff0000', secondary: '#ff0000' },
 ];
 
 export const strobeEffectTypes = [

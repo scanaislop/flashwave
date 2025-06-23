@@ -76,7 +76,6 @@ export const manualStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  colorContainer: {},
   colorTitle: {
     fontSize: 18,
     fontFamily: 'Rajdhani-Bold',
@@ -86,7 +85,7 @@ export const manualStyles = StyleSheet.create({
   colorGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: 10,
   },
   colorItem: {
     width: 25,

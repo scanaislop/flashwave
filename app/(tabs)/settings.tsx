@@ -1,4 +1,5 @@
 import NeonContainer from '@/components/shared/NeonContainer';
+import { useTheme } from '@/context/ThemeContext';
 import { settingsStyles } from '@/components/styles/settings';
 import Slider from '@react-native-community/slider';
 import * as Haptics from 'expo-haptics';
@@ -10,7 +11,7 @@ import { Alert, Platform, ScrollView, Switch, Text, TouchableOpacity, View } fro
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('dark');
+  const { colors } = useTheme();
   const [defaultMode, setDefaultMode] = useState('sound-reactive');
   const [flashlightDefault, setFlashlightDefault] = useState(true);
   const [safetyTimer, setSafetyTimer] = useState(15);
@@ -18,13 +19,6 @@ export default function SettingsScreen() {
   const [hapticFeedback, setHapticFeedback] = useState(true);
   const [keepScreenOn, setKeepScreenOn] = useState(true);
   const [lowBatteryMode, setLowBatteryMode] = useState(false);
-
-  const handleThemeChange = (newTheme: 'light' | 'dark' | 'system') => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    setTheme(newTheme);
-  };
 
   const handleModeChange = (mode: string) => {
     if (Platform.OS !== 'web') {
@@ -61,34 +55,7 @@ export default function SettingsScreen() {
         </View>
 
         <ScrollView style={settingsStyles.content} showsVerticalScrollIndicator={false}>
-          {/* Appearance */}
-          <NeonContainer style={settingsStyles.section}>
-            <Text style={settingsStyles.sectionTitle}>Appearance</Text>
 
-            <View style={settingsStyles.settingItem}>
-              <Text style={settingsStyles.settingLabel}>Theme</Text>
-              <View style={settingsStyles.themeOptions}>
-                {[{ key: 'light', label: 'Light', icon: Sun }, {
-                  key: 'dark',
-                  label: 'Dark',
-                  icon: Moon
-                }, { key: 'system', label: 'System', icon: Smartphone }].map((option) => (<TouchableOpacity
-                    key={option.key}
-                    onPress={() => handleThemeChange(option.key as any)}
-                    style={[settingsStyles.themeOption, theme === option.key && settingsStyles.activeThemeOption]}>
-                    <option.icon
-                      size={16}
-                      color={theme === option.key ? '#06FFA5' : '#64748B'}
-                    />
-                    <Text style={[settingsStyles.themeOptionText, theme === option.key && settingsStyles.activeThemeOptionText]}>
-                      {option.label}
-                    </Text>
-                  </TouchableOpacity>))}
-              </View>
-            </View>
-          </NeonContainer>
-
-          {/* Default Settings */}
           <NeonContainer style={settingsStyles.section}>
             <Text style={settingsStyles.sectionTitle}>Default Settings</Text>
 

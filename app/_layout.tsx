@@ -3,6 +3,8 @@ import { Stack, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { hasAcceptedCurrentDisclaimer } from '@/utils/storage';
+import { ThemeProvider } from '@/context/ThemeContext';
+import { TabBarProvider } from '@/context/TabBarContext';
 import { useFonts } from 'expo-font';
 import {
   Orbitron_400Regular,
@@ -68,14 +70,17 @@ export default function RootLayout() {
   }
 
   return (
-    <>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="onboarding" />
-        <Stack.Screen name="disclaimer" />
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="light" />
-    </>
+    <ThemeProvider>
+      <TabBarProvider>
+        <StatusBar style="light" />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="disclaimer" />
+          <Stack.Screen name="onboarding" />
+          <Stack.Screen name="strobe" />
+        </Stack>
+      </TabBarProvider>
+    </ThemeProvider>
   );
 }

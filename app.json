@@ -15,7 +15,10 @@
         "CAMERA",
         "VIBRATE",
         "WAKE_LOCK",
-        "SYSTEM_ALERT_WINDOW"
+        "SYSTEM_ALERT_WINDOW",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.WRITE_SETTINGS"
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
@@ -28,9 +31,10 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "Flashwave needs camera access to control the flashlight for the strobe effects.",
-        "UIViewControllerBasedStatusBarAppearance": true
+        "UIViewControllerBasedStatusBarAppearance": false
       },
-      "buildNumber": "1.0.0"
+      "buildNumber": "1.0.0",
+      "appleTeamId": "X32RR735CK"
     },
     "web": {
       "bundler": "metro",

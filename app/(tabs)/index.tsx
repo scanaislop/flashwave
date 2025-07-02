@@ -1,26 +1,20 @@
-import React, { useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import AnimatedWave from '@/components/shared/AnimatedWave';
 import GlowButton from '@/components/shared/GlowButton';
 import NeonContainer from '@/components/shared/NeonContainer';
-import AnimatedWave from '@/components/shared/AnimatedWave';
-import { modes } from '@/types/modes';
-import { Moon, Sun } from 'lucide-react-native';
 import { homeStyles } from '@/components/styles/home';
+import { modes } from '@/types/modes';
+import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
-  const [isDarkMode, setIsDarkMode] = useState(true);
   const [lastUsedMode, setLastUsedMode] = useState('sound-reactive');
 
   const handleModePress = (route: string, modeId: string) => {
     setLastUsedMode(modeId);
     router.push(route as any);
-  };
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
   };
 
   const handleStartLightshow = () => {
@@ -37,9 +31,6 @@ export default function HomeScreen() {
           <Text style={homeStyles.appTitle}>FLASHWAVE</Text>
           <Text style={homeStyles.tagline}>Party Light Controller</Text>
         </View>
-        <TouchableOpacity onPress={toggleTheme} style={homeStyles.themeToggle}>
-          {isDarkMode ? (<Sun size={24} color="#F59E0B" />) : (<Moon size={24} color="#8B5CF6" />)}
-        </TouchableOpacity>
       </View>
 
       <ScrollView style={homeStyles.content} showsVerticalScrollIndicator={false}>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ScrollView, Text, View, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTheme } from '@/context/ThemeContext';
 import { router, useLocalSearchParams } from 'expo-router';
 import { saveDisclaimerAcceptance } from '@/utils/storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,6 +10,7 @@ import NeonContainer from '@/components/shared/NeonContainer';
 import { AlertTriangle } from 'lucide-react-native';
 
 export default function DisclaimerScreen() {
+    const { colors } = useTheme();
     const { returnTo } = useLocalSearchParams();
     const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
 

@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Dimensions, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTheme } from '@/context/ThemeContext';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import GlowButton from '@/components/shared/GlowButton';
@@ -12,13 +13,14 @@ import { onboardingStyles } from '@/components/styles/onboarding';
 const { width } = Dimensions.get('window');
 
 export default function OnboardingScreen() {
+  const { colors } = useTheme();
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollViewRef = useRef<ScrollView>(null);
 
   const handleNext = () => {
     if (currentIndex < onboardingData.length - 1) {
       const nextIndex = currentIndex + 1;
-      setCurrentIndex(nextIndex);
+      setCurrentIndex(nextIndex); 
       scrollViewRef.current?.scrollTo({
         x: nextIndex * width, animated: true
       });
@@ -55,7 +57,7 @@ export default function OnboardingScreen() {
     </View>);
   };
 
-  return (<LinearGradient colors={['#0A0A0F', '#1A1A2E']} style={onboardingStyles.container}>
+  return (<LinearGradient colors={colors.backgroundGradient} style={onboardingStyles.container}>
     <SafeAreaView style={onboardingStyles.safeArea}>
       <View style={onboardingStyles.header}>
         <TouchableOpacity onPress={handleSkip} style={onboardingStyles.skipButton}>

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Alert, Animated, Platform, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, Animated, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import * as Brightness from 'expo-brightness';
@@ -10,6 +10,7 @@ import { strobeColors } from '@/constants/color';
 import { Header } from '@/components/strobe/Header';
 import { CenterControls } from '@/components/strobe/CenterControls';
 import { HardwareControls } from '@/components/strobe/HardwareControls';
+import { TimerControls } from '@/components/strobe/TimerControls';
 import { SpeedControl } from '@/components/strobe/SpeedControl';
 import { EffectSelection } from '@/components/strobe/EffectSelection';
 import { SustainedModeToggle } from '@/components/strobe/SustainedModeToggle';
@@ -25,16 +26,24 @@ interface StrobeSettings {
   sustainedMode: boolean;
   flashlightEnabled: boolean;
   screenBrightness: number;
+  timerEnabled?: boolean;
+  timerMinutes?: number;
 }
 
 const STORAGE_KEY = '@flashwave_strobe_settings';
 
-export default function StrobeScreen() {
+// Timer styles are now integrated into strobeStyles in components/styles/strobe.ts
+
+interface StrobeScreenProps {
+  autoStart?: boolean;
+}
+
+export default function StrobeScreen({ autoStart = false }: StrobeScreenProps) {
   const [isStrobing, setIsStrobing] = useState(false);
   const [strobeSpeed, setStrobeSpeed] = useState(0.5);
   const [selectedColor, setSelectedColor] = useState(0);
   const [selectedEffect, setSelectedEffect] = useState(0);
-  const [showControls, setShowControls] = useState(true);
+  const [showControls, setShowControls] = useState(!autoStart);
   const [sustainedMode, setSustainedMode] = useState(true);
   const [flashlightEnabled, setFlashlightEnabled] = useState(false);
   const [screenBrightness, setScreenBrightness] = useState(1.0);
@@ -42,6 +51,10 @@ export default function StrobeScreen() {
   const [torchAvailable, setTorchAvailable] = useState(false);
   const [currentColorIndex, setCurrentColorIndex] = useState(0);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [timerEnabled, setTimerEnabled] = useState(false);
+  const [timerMinutes, setTimerMinutes] = useState(5);
+  const [timerRemaining, setTimerRemaining] = useState(0);
+  const [showTimer, setShowTimer] = useState(false);
   
   const flashAnimation = useRef(new Animated.Value(0)).current;
   const sustainedAnimation = useRef(new Animated.Value(0)).current;
@@ -55,6 +68,7 @@ export default function StrobeScreen() {
   const strobeInterval = useRef<NodeJS.Timeout | null>(null);
   const flashlightInterval = useRef<NodeJS.Timeout | null>(null);
   const hideControlsTimeout = useRef<NodeJS.Timeout | null>(null);
+  const timerInterval = useRef<NodeJS.Timeout | null>(null);
   const isMounted = useRef(true);
 
   const hideControls = useCallback(() => {
@@ -114,8 +128,17 @@ export default function StrobeScreen() {
           setFlashlightEnabled(settings.flashlightEnabled);
           setScreenBrightness(settings.screenBrightness);
           
-          // Start strobing if it was active
-          if (settings.isStrobing) {
+          // Load timer settings if available
+          if (settings.timerEnabled !== undefined) {
+            setTimerEnabled(settings.timerEnabled);
+          }
+          if (settings.timerMinutes !== undefined) {
+            setTimerMinutes(settings.timerMinutes);
+          }
+          
+          // Start strobing if it was active and we're not auto-starting
+          // (if auto-starting, we'll handle this separately)
+          if (settings.isStrobing && !autoStart) {
             setIsStrobing(true);
           }
         }
@@ -127,7 +150,7 @@ export default function StrobeScreen() {
         setIsInitialized(true);
       }
     }
-  }, []);
+  }, [autoStart]);
 
   // Save settings to AsyncStorage whenever they change
   const saveSettings = useCallback(async () => {
@@ -141,6 +164,8 @@ export default function StrobeScreen() {
       sustainedMode,
       flashlightEnabled,
       screenBrightness,
+      timerEnabled,
+      timerMinutes
     };
 
     try {
@@ -148,15 +173,32 @@ export default function StrobeScreen() {
     } catch (error) {
       console.error('Failed to save settings', error);
     }
-  }, [isStrobing, strobeSpeed, selectedColor, selectedEffect, sustainedMode, flashlightEnabled, screenBrightness, isInitialized]);
+  }, [isStrobing, strobeSpeed, selectedColor, selectedEffect, sustainedMode, flashlightEnabled, screenBrightness, timerEnabled, timerMinutes, isInitialized]);
 
   // Load settings on mount
   useEffect(() => {
     loadSettings();
+    
+    // Auto-start if prop is true
+    if (autoStart) {
+      // Small delay to ensure settings are loaded
+      const startTimeout = setTimeout(() => {
+        if (isMounted.current) {
+          setIsStrobing(true);
+          hideControls();
+        }
+      }, 300);
+      
+      return () => {
+        clearTimeout(startTimeout);
+        isMounted.current = false;
+      };
+    }
+    
     return () => {
       isMounted.current = false;
     };
-  }, [loadSettings]);
+  }, [loadSettings, autoStart, hideControls]);
 
   // Save settings when they change
   useEffect(() => {
@@ -196,7 +238,7 @@ export default function StrobeScreen() {
             await Torch.switchState(false);
             setTorchAvailable(true);
           } else {
-            console.log('Torch module not available');
+            console.log('Torch module not available on this device w');
           }
         } else {
           const cameraAllowed = await Torch.requestCameraPermission('Camera Permissions', 'We require camera permissions to use the torch on the back of your phone.');
@@ -205,7 +247,7 @@ export default function StrobeScreen() {
               await Torch.switchState(false);
               setTorchAvailable(true);
             } else {
-              console.log('Torch module not available');
+              console.log('Torch module not available on this device');
             }
           }
         }
@@ -213,10 +255,12 @@ export default function StrobeScreen() {
         console.log('Could not check torch availability:', error);
       }
       try {
+        // Get and save the original brightness before changing anything
         const brightness = await Brightness.getBrightnessAsync();
-        if (isMounted) {
+        if (isMounted.current) {
           setOriginalBrightness(brightness);
           setScreenBrightness(brightness);
+          console.log('Original brightness saved:', brightness);
         }
       } catch (error) {
         console.log('Could not get brightness:', error);
@@ -228,17 +272,27 @@ export default function StrobeScreen() {
     return () => {
       isMounted.current = false;
       if (Platform.OS !== 'web') {
-        Brightness.setBrightnessAsync(originalBrightness);
-        if (torchAvailable) {
-          if (Torch && Torch.switchState) {
-            Torch.switchState(false);
+        // Make sure to restore original brightness when unmounting
+        try {
+          console.log('Restoring brightness on unmount to:', originalBrightness);
+          Brightness.setBrightnessAsync(originalBrightness);
+          
+          // Turn off flashlight if it was on
+          if (torchAvailable) {
+            if (Torch && Torch.switchState) {
+              Torch.switchState(false);
+            }
           }
+        } catch (error) {
+          console.log('Error during cleanup:', error);
         }
       }
+      
       // Clear intervals and timeouts
       if (strobeInterval.current) clearInterval(strobeInterval.current);
       if (flashlightInterval.current) clearInterval(flashlightInterval.current);
       if (hideControlsTimeout.current) clearTimeout(hideControlsTimeout.current);
+      if (timerInterval.current) clearInterval(timerInterval.current);
     };
   }, []);
 
@@ -274,6 +328,11 @@ export default function StrobeScreen() {
     try {
       await Brightness.setBrightnessAsync(value);
       setScreenBrightness(value);
+      // Only update original brightness if we're not strobing
+      // This prevents the original brightness from being overwritten during strobe
+      if (!isStrobing) {
+        setOriginalBrightness(value);
+      }
     } catch (error) {
       console.log('Error setting brightness:', error);
     }
@@ -301,6 +360,14 @@ export default function StrobeScreen() {
       Alert.alert('Error', 'Could not control flashlight. Make sure no other app is using the camera.');
     }
   };
+
+  const toggleTimer = useCallback(() => {
+    setTimerEnabled(prev => !prev);
+  }, []);
+
+  const handleTimerChange = useCallback((value: number) => {
+    setTimerMinutes(Math.round(value));
+  }, []);
 
   const startFlashlightStrobe = () => {
     if (Platform.OS === 'web' || !torchAvailable) return;
@@ -435,6 +502,21 @@ export default function StrobeScreen() {
 
   const startStrobing = useCallback(() => {
     if (!isStrobing) {
+      // Save current brightness as original if not already saved
+      if (Platform.OS !== 'web') {
+        try {
+          // Get current brightness before starting strobe
+          Brightness.getBrightnessAsync().then(currentBrightness => {
+            if (isMounted.current) {
+              setOriginalBrightness(currentBrightness);
+              console.log('Saved brightness before strobing:', currentBrightness);
+            }
+          });
+        } catch (error) {
+          console.log('Error saving brightness before strobing:', error);
+        }
+      }
+      
       setIsStrobing(true);
       showControlsTemporarily();
     }
@@ -444,8 +526,18 @@ export default function StrobeScreen() {
     if (isStrobing) {
       setIsStrobing(false);
       showControlsPermanently();
+      
+      // Restore original brightness when stopping
+      if (Platform.OS !== 'web') {
+        try {
+          Brightness.setBrightnessAsync(originalBrightness);
+          setScreenBrightness(originalBrightness);
+        } catch (error) {
+          console.log('Error restoring brightness:', error);
+        }
+      }
     }
-  }, [isStrobing, showControlsPermanently]);
+  }, [isStrobing, showControlsPermanently, originalBrightness]);
 
   const handleToggleControls = useCallback(() => {
     if (showControls) {
@@ -461,7 +553,9 @@ export default function StrobeScreen() {
       setIsStrobing(false);
       if (Platform.OS !== 'web') {
         try {
+          console.log('Restoring brightness before navigating back to:', originalBrightness);
           await Brightness.setBrightnessAsync(originalBrightness);
+          setScreenBrightness(originalBrightness);
         } catch (error) {
           console.log('Error restoring brightness:', error);
         }
@@ -484,46 +578,72 @@ export default function StrobeScreen() {
   useEffect(() => {
     if (isStrobing) {
       startStrobeEffect();
-      if (sustainedMode) {
-        startSustainedEffect();
-      }
-      if (flashlightEnabled) {
+      
+      if (flashlightEnabled && torchAvailable && Platform.OS !== 'web') {
         startFlashlightStrobe();
+      }
+      
+      // Auto-hide controls after 3 seconds
+      hideControlsTimeout.current = setTimeout(() => {
+        hideControls();
+      }, 3000) as unknown as NodeJS.Timeout;
+      
+      // Start timer if enabled
+      if (timerEnabled && timerMinutes > 0) {
+        const totalSeconds = timerMinutes * 60;
+        setTimerRemaining(totalSeconds);
+        setShowTimer(true);
+        
+        timerInterval.current = setInterval(() => {
+          setTimerRemaining(prev => {
+            if (prev <= 1) {
+              // Timer complete, stop strobe
+              if (timerInterval.current) {
+                clearInterval(timerInterval.current);
+                timerInterval.current = null;
+              }
+              setIsStrobing(false);
+              setShowTimer(false);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000) as unknown as NodeJS.Timeout;
       }
     } else {
-      stopStrobeEffect();
-      stopSustainedEffect();
+      // Stop all effects
+      if (strobeInterval.current) {
+        clearInterval(strobeInterval.current);
+        strobeInterval.current = null;
+      }
+      
+      // Clear timer if running
+      if (timerInterval.current) {
+        clearInterval(timerInterval.current);
+        timerInterval.current = null;
+        setShowTimer(false);
+      }
+      
       stopFlashlightStrobe();
+      
+      // Reset animations
+      flashAnimation.setValue(0);
+      sustainedAnimation.setValue(0);
+      burstAnimation.setValue(0);
+      
+      // Show controls when stopped
+      showControlsPermanently();
     }
-  }, [isStrobing]);
-
-  useEffect(() => {
-    if (isStrobing) {
-      startStrobeEffect();
-    }
-  }, [strobeSpeed, selectedEffect]);
-
-  // Handle sustained mode changes
-  useEffect(() => {
-    if (isStrobing) {
-      if (sustainedMode) {
-        startSustainedEffect();
-      } else {
-        stopSustainedEffect();
+    
+    return () => {
+      if (hideControlsTimeout.current) {
+        clearTimeout(hideControlsTimeout.current);
       }
-    }
-  }, [sustainedMode]);
-
-  // Handle flashlight changes
-  useEffect(() => {
-    if (isStrobing) {
-      if (flashlightEnabled) {
-        startFlashlightStrobe();
-      } else {
-        stopFlashlightStrobe();
+      if (timerInterval.current) {
+        clearInterval(timerInterval.current);
       }
-    }
-  }, [flashlightEnabled]);
+    };
+  }, [isStrobing, flashlightEnabled, torchAvailable, hideControls, showControlsPermanently, timerEnabled, timerMinutes]);
 
   return (
     <View style={[strobeStyles.container, { backgroundColor: '#000000' }]}>
@@ -542,6 +662,17 @@ export default function StrobeScreen() {
           sustainedMode={sustainedMode}
         />
       </View>
+      
+      {/* Timer Display */}
+      {showTimer && timerRemaining > 0 && (
+        <View style={[StyleSheet.absoluteFillObject, { zIndex: 3 }]} pointerEvents="none">
+          <View style={strobeStyles.timerContainer}>
+            <Text style={[strobeStyles.timerText, { color: currentColor.color }]}>
+              {Math.floor(timerRemaining / 60)}:{(timerRemaining % 60).toString().padStart(2, '0')}
+            </Text>
+          </View>
+        </View>
+      )}
       
       {/* Controls Layer */}
       <View style={[StyleSheet.absoluteFillObject, { zIndex: 2 }]} pointerEvents="box-none">
@@ -570,14 +701,27 @@ export default function StrobeScreen() {
               toggleStrobe={isStrobing ? stopStrobing : startStrobing} 
             />
             <View style={strobeStyles.bottomControls}>
-              <HardwareControls
-                flashlightEnabled={flashlightEnabled}
-                screenBrightness={screenBrightness}
-                currentColor={currentColor}
-                torchAvailable={torchAvailable}
-                toggleFlashlight={toggleFlashlight}
-                handleBrightnessChange={handleBrightnessChange}
-              />
+              <View style={strobeStyles.controlRow}>
+                <View style={strobeStyles.controlColumn}>
+                  <HardwareControls
+                    flashlightEnabled={flashlightEnabled}
+                    screenBrightness={screenBrightness}
+                    currentColor={currentColor}
+                    torchAvailable={torchAvailable}
+                    toggleFlashlight={toggleFlashlight}
+                    handleBrightnessChange={handleBrightnessChange}
+                  />
+                </View>
+                <View style={strobeStyles.controlColumn}>
+                  <TimerControls
+                    timerEnabled={timerEnabled}
+                    timerMinutes={timerMinutes}
+                    currentColor={currentColor}
+                    toggleTimer={toggleTimer}
+                    handleTimerChange={handleTimerChange}
+                  />
+                </View>
+              </View>
               <SpeedControl strobeSpeed={strobeSpeed} currentColor={currentColor} setStrobeSpeed={setStrobeSpeed} />
               <EffectSelection 
                 selectedEffect={selectedEffect} 

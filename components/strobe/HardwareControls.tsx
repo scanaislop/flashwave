@@ -19,7 +19,7 @@ export const HardwareControls = ({
     toggleFlashlight: () => void;
     handleBrightnessChange: (value: number) => void
 }) => (<View style={strobeStyles.controlSection}>
-    <Text style={strobeStyles.controlLabel}>Hardware Controls</Text>
+    <Text style={strobeStyles.controlLabel}>Flashlight</Text>
     <View style={strobeStyles.hardwareControls}>
         <TouchableOpacity
             onPress={toggleFlashlight}
@@ -30,7 +30,7 @@ export const HardwareControls = ({
             {flashlightEnabled ? (<Flashlight size={20} color={currentColor.color} />) : (
                 <FlashlightOff size={20} color="#94A3B8" />)}
             <Text style={[strobeStyles.hardwareButtonText, flashlightEnabled && { color: currentColor.color }]}>
-                Flashlight {!torchAvailable && Platform.OS !== 'web' && '(N/A)'}
+                {flashlightEnabled ? 'On' : 'Off'} {!torchAvailable && Platform.OS !== 'web' && '(N/A)'}
             </Text>
         </TouchableOpacity>
         <View style={strobeStyles.brightnessContainer}>

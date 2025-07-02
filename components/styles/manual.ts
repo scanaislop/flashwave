@@ -1,6 +1,35 @@
 import { StyleSheet } from 'react-native';
 
 export const manualStyles = StyleSheet.create({
+  mainSettingsRow: {
+    // flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
+  },
+  mainSettingsColumn: {
+    flex: 3,
+    marginRight: 10,
+  },
+  sideSettingsColumn: {
+    flex: 2,
+  },
+  fullscreenOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 999,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingBottom: 50,
+  },
+  exitFullscreenText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    opacity: 0.7,
+    fontFamily: 'Orbitron_400Regular',
+  },
   container: {
     flex: 1,
   },

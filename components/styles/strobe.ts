@@ -2,6 +2,32 @@ import { Dimensions, Platform, StyleSheet } from 'react-native';
 const { width } = Dimensions.get('window');
 
 export const strobeStyles = StyleSheet.create({
+    controlRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      width: '100%',
+      marginBottom: 10,
+    },
+    controlColumn: {
+      flex: 1,
+      marginHorizontal: 5,
+    },
+    timerContainer: {
+      position: 'absolute',
+      top: 40,
+      right: 20,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      borderRadius: 20,
+      padding: 10,
+      borderWidth: 1,
+      borderColor: '#333',
+      zIndex: 1000,
+    },
+    timerText: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      textAlign: 'center',
+    },
     container: {
       flex: 1,
       backgroundColor: '#000000',

@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 interface NeonContainerProps {
   children: React.ReactNode;
-  style?: ViewStyle;
+  style?: ViewStyle | undefined | any;
   glowColor?: string;
   variant?: 'subtle' | 'medium' | 'strong';
 }

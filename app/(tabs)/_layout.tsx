@@ -40,12 +40,12 @@ export default function TabLayout() {
         title: 'Sync', tabBarIcon: ({ size, color }) => (<Users size={size} color={color} />)
       }}
     />
-    <Tabs.Screen
+    {/* <Tabs.Screen
       name="visual-effects"
       options={{
         title: 'Effects', tabBarIcon: ({ size, color }) => (<Palette size={size} color={color} />)
       }}
-    />
+    /> */}
     <Tabs.Screen
       name="settings"
       options={{

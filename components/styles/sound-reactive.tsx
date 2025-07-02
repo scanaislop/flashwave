@@ -77,16 +77,19 @@ export const soundReactiveStyles = StyleSheet.create({
       color: '#FFFFFF',
     },
     sliderContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      width: '100%',
       gap: 10,
     },
     sliderLabel: {
-      paddingTop: 10,
       fontSize: 16,
       fontFamily: 'Rajdhani-Medium',
       color: '#FFFFFF',
     },
     slider: {
       height: 40,
+      flex: 1,
     },
     paletteContainer: {
       gap: 16,
@@ -101,6 +104,40 @@ export const soundReactiveStyles = StyleSheet.create({
       flexWrap: 'wrap',
       justifyContent: 'flex-start',
       gap: 12,
+    },
+    fullScreenContainer: {
+      flex: 1,
+    },
+    backButton: {
+      position: 'absolute',
+      top: 40,
+      left: 20,
+      zIndex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 10,
+    },
+    backButtonText: {
+      color: '#FFFFFF',
+      fontSize: 16,
+      fontFamily: 'Rajdhani-Medium',
+      marginLeft: 8,
+    },
+    fullScreenContent: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    fullScreenBpmText: {
+      position: 'absolute',
+      color: '#FFFFFF',
+      fontSize: 24,
+      fontFamily: 'Orbitron-Bold',
+    },
+    bpmText: {
+      color: '#94A3B8',
+      fontFamily: 'Rajdhani-Regular',
+      fontSize: 16,
     },
     paletteItem: {
       width: '31%',

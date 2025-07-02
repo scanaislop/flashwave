@@ -25,7 +25,7 @@ export default function HomeScreen() {
   const handleStartLightshow = () => {
     const lastMode = modes.find(mode => mode.id === lastUsedMode);
     if (lastMode) {
-      router.push(lastMode.route);
+      // router.push(lastMode.route);
     }
   };
 

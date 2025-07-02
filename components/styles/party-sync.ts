@@ -147,6 +147,8 @@ export const partySyncStyles = StyleSheet.create({
   partyCodeHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
     gap: 12,
     marginBottom: 12,
   },
@@ -218,7 +220,8 @@ export const partySyncStyles = StyleSheet.create({
     color: '#64748B',
   },
   syncContainer: {
-    alignItems: 'center',
+    // alignItems: 'center',
+    width: '100%',
     marginBottom: 20,
   },
   syncHeader: {
@@ -237,12 +240,31 @@ export const partySyncStyles = StyleSheet.create({
     fontFamily: 'Rajdhani-Regular',
     color: '#94A3B8',
     textAlign: 'center',
-    marginBottom: 16,
   },
-  syncButton: {
-    width: '100%',
+  overlayContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(10, 10, 15, 0.95)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
   },
-  leaveButton: {
-    marginBottom: 30,
+  overlayContent: {
+    alignItems: 'center',
+    gap: 20,
+    paddingHorizontal: 20,
+  },
+  overlayText: {
+    fontSize: 24,
+    fontFamily: 'Orbitron-Bold',
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
+  overlaySubText: {
+    fontSize: 16,
+    fontFamily: 'Rajdhani-Regular',
+    color: '#94A3B8',
+    textAlign: 'center',
+    maxWidth: '80%',
+    lineHeight: 22,
   },
 });

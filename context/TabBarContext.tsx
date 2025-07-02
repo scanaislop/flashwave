@@ -5,7 +5,7 @@ interface TabBarContextType {
   setTabBarVisible: (visible: boolean) => void;
 }
 
-const TabBarContext = createContext<TabBarContextType>({
+export const TabBarContext = createContext<TabBarContextType>({
   isTabBarVisible: true,
   setTabBarVisible: () => {},
 });

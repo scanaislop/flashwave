@@ -61,33 +61,6 @@ export default function SettingsScreen() {
         </View>
 
         <ScrollView style={settingsStyles.content} showsVerticalScrollIndicator={false}>
-          {/* Appearance */}
-          <NeonContainer style={settingsStyles.section}>
-            <Text style={settingsStyles.sectionTitle}>Appearance</Text>
-
-            <View style={settingsStyles.settingItem}>
-              <Text style={settingsStyles.settingLabel}>Theme</Text>
-              <View style={settingsStyles.themeOptions}>
-                {[{ key: 'light', label: 'Light', icon: Sun }, {
-                  key: 'dark',
-                  label: 'Dark',
-                  icon: Moon
-                }, { key: 'system', label: 'System', icon: Smartphone }].map((option) => (<TouchableOpacity
-                    key={option.key}
-                    onPress={() => handleThemeChange(option.key as any)}
-                    style={[settingsStyles.themeOption, theme === option.key && settingsStyles.activeThemeOption]}>
-                    <option.icon
-                      size={16}
-                      color={theme === option.key ? '#06FFA5' : '#64748B'}
-                    />
-                    <Text style={[settingsStyles.themeOptionText, theme === option.key && settingsStyles.activeThemeOptionText]}>
-                      {option.label}
-                    </Text>
-                  </TouchableOpacity>))}
-              </View>
-            </View>
-          </NeonContainer>
-
           {/* Default Settings */}
           <NeonContainer style={settingsStyles.section}>
             <Text style={settingsStyles.sectionTitle}>Default Settings</Text>

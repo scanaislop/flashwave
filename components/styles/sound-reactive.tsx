@@ -102,7 +102,7 @@ export const soundReactiveStyles = StyleSheet.create({
       fontSize: 14,
       fontFamily: 'Rajdhani-Bold',
       color: '#FFFFFF',
-      paddingVertical: 16,
+      paddingBottom: 10,
     },
     paletteGrid: {
       flexDirection: 'row',

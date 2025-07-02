@@ -7,7 +7,6 @@ import GlowButton from '@/components/shared/GlowButton';
 import NeonContainer from '@/components/shared/NeonContainer';
 import AnimatedWave from '@/components/shared/AnimatedWave';
 import { modes } from '@/types/modes';
-import { Moon, Sun } from 'lucide-react-native';
 import { homeStyles } from '@/components/styles/home';
 
 export default function HomeScreen() {
@@ -37,9 +36,6 @@ export default function HomeScreen() {
           <Text style={homeStyles.appTitle}>FLASHWAVE</Text>
           <Text style={homeStyles.tagline}>Party Light Controller</Text>
         </View>
-        <TouchableOpacity onPress={toggleTheme} style={homeStyles.themeToggle}>
-          {isDarkMode ? (<Sun size={24} color="#F59E0B" />) : (<Moon size={24} color="#8B5CF6" />)}
-        </TouchableOpacity>
       </View>
 
       <ScrollView style={homeStyles.content} showsVerticalScrollIndicator={false}>

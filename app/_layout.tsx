@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { hasAcceptedCurrentDisclaimer } from '@/utils/storage';
 import { useFonts } from 'expo-font';
+import { TabBarProvider } from '@/context/TabBarContext';
 import {
   Orbitron_400Regular,
   Orbitron_700Bold,
@@ -68,7 +69,7 @@ export default function RootLayout() {
   }
 
   return (
-    <>
+    <TabBarProvider>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="onboarding" />
         <Stack.Screen name="disclaimer" />
@@ -76,6 +77,6 @@ export default function RootLayout() {
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="light" />
-    </>
+    </TabBarProvider>
   );
 }

@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
-import { Stack } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Stack, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
+import { hasAcceptedCurrentDisclaimer } from '@/utils/storage';
 import { useFonts } from 'expo-font';
 import {
   Orbitron_400Regular,
@@ -20,6 +21,7 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   useFrameworkReady();
+  const [disclaimerChecked, setDisclaimerChecked] = useState(false);
 
   const [fontsLoaded, fontError] = useFonts({
     'Orbitron-Regular': Orbitron_400Regular,
@@ -37,6 +39,30 @@ export default function RootLayout() {
     }
   }, [fontsLoaded, fontError]);
 
+  // Check if user has accepted the current disclaimer version
+  useEffect(() => {
+    const checkDisclaimer = async () => {
+      try {
+        const hasAccepted = await hasAcceptedCurrentDisclaimer();
+        setDisclaimerChecked(true);
+        
+        // If user hasn't accepted current disclaimer version
+        if (!hasAccepted) {
+          // We'll redirect to disclaimer and return to tabs after acceptance
+          router.replace({
+            pathname: '/disclaimer',
+            params: { returnTo: '/(tabs)' }
+          });
+        }
+      } catch (error) {
+        console.error('Error checking disclaimer:', error);
+        setDisclaimerChecked(true);
+      }
+    };
+    
+    checkDisclaimer();
+  }, []);
+
   if (!fontsLoaded && !fontError) {
     return null;
   }
@@ -45,6 +71,7 @@ export default function RootLayout() {
     <>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="onboarding" />
+        <Stack.Screen name="disclaimer" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="+not-found" />
       </Stack>

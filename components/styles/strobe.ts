@@ -137,7 +137,7 @@ export const strobeStyles = StyleSheet.create({
       borderColor: 'transparent',
     },
     hardwareButtonText: {
-      fontSize: 14,
+      fontSize: 12,
       fontFamily: 'Rajdhani-Bold',
       color: '#94A3B8',
     },
@@ -180,7 +180,7 @@ export const strobeStyles = StyleSheet.create({
       borderColor: 'transparent',
     },
     effectText: {
-      fontSize: 11,
+      fontSize: 10,
       fontFamily: 'Rajdhani-Medium',
       color: '#94A3B8',
     },
@@ -194,7 +194,7 @@ export const strobeStyles = StyleSheet.create({
       alignItems: 'center',
     },
     sustainedText: {
-      fontSize: 14,
+      fontSize: 10,
       fontFamily: 'Rajdhani-Bold',
       color: '#94A3B8',
     },

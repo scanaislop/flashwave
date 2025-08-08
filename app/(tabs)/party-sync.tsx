@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Platform, ScrollView, Text, TextInput, TouchableOpacity, View, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import GlowButton from '@/components/shared/GlowButton';
 import NeonContainer from '@/components/shared/NeonContainer';
-import { Copy, Crown, UserPlus, Zap } from 'lucide-react-native';
+import { Copy, Crown, Rocket, UserPlus, Zap } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { partySyncStyles } from '@/components/styles/party-sync';
 import { mockParticipants } from '@/mocks/users';
@@ -145,20 +145,23 @@ export default function PartySyncScreen() {
       </LinearGradient>);
   }
 
-  return (<LinearGradient colors={['#0A0A0F', '#1A1A2E']} style={partySyncStyles.container}>
-      <SafeAreaView style={partySyncStyles.safeArea}>
+  return (
+    <LinearGradient colors={['#0A0A0F', '#1A1A2E']} style={partySyncStyles.container}>
+      <SafeAreaView style={partySyncStyles.safeArea} edges={['right', 'left', 'top']}>
         <View style={partySyncStyles.header}>
-          <View style={partySyncStyles.titleRow}>
-            <Text style={partySyncStyles.title}>{isHost ? 'Hosting Party' : 'Joined Party'}</Text>
-            {isHost && <Crown size={24} color="#06FFA5" />}
-          </View>
-          <Text style={partySyncStyles.subtitle}>
-            {participants.filter(p => p.isConnected).length + 1} devices connected
-          </Text>
+          <Text style={partySyncStyles.title}>Party Sync</Text>
+          <Text style={partySyncStyles.subtitle}>Connect devices for synchronized light shows</Text>
         </View>
 
-        <ScrollView style={partySyncStyles.content} showsVerticalScrollIndicator={false}>
-          {isHost && (<NeonContainer style={partySyncStyles.partyCodeContainer} glowColor="#06FFA5">
+        <View style={styles.overlay}>
+          <Rocket size={64} color="#06FFA5" style={styles.rocketIcon} />
+          <Text style={styles.comingSoonTitle}>Coming Soon</Text>
+          <Text style={styles.comingSoonSubtitle}>We're building something amazing. Stay tuned!</Text>
+        </View>
+
+        <ScrollView style={[partySyncStyles.content, { opacity: 0.1 }]} showsVerticalScrollIndicator={false} scrollEnabled={false}>
+          {isHost && (
+            <NeonContainer style={partySyncStyles.partyCodeContainer} glowColor="#06FFA5">
               <View style={partySyncStyles.partyCodeHeader}>
                 <Text style={partySyncStyles.partyCodeTitle}>Party Code</Text>
                 <TouchableOpacity onPress={copyPartyCode} style={partySyncStyles.copyButton}>
@@ -167,7 +170,8 @@ export default function PartySyncScreen() {
               </View>
               <Text style={partySyncStyles.partyCodeText}>{hostCode}</Text>
               <Text style={partySyncStyles.partyCodeSubtitle}>Share this code with friends</Text>
-            </NeonContainer>)}
+            </NeonContainer>
+          )}
 
           <NeonContainer style={partySyncStyles.participantsContainer}>
             <Text style={partySyncStyles.participantsTitle}>Participants</Text>
@@ -213,7 +217,6 @@ export default function PartySyncScreen() {
               onPress={syncTestFlash}
               variant="secondary"
               size="medium"
-              style={partySyncStyles.syncButton}
             />
           </NeonContainer>
 
@@ -222,9 +225,48 @@ export default function PartySyncScreen() {
             onPress={leaveParty}
             variant="danger"
             size="large"
-            style={partySyncStyles.leaveButton}
+            style={styles.leaveButton}
           />
         </ScrollView>
       </SafeAreaView>
-    </LinearGradient>);
+    </LinearGradient>
+  );
 }
+
+const styles = StyleSheet.create({
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(10, 10, 15, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  rocketIcon: {
+    marginBottom: 24,
+    textShadowColor: 'rgba(6, 255, 165, 0.5)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 15,
+  },
+  comingSoonTitle: {
+    fontFamily: 'Orbitron-Bold',
+    fontSize: 36,
+    color: '#FFFFFF',
+    letterSpacing: 2,
+    marginBottom: 12,
+    textShadowColor: 'rgba(6, 255, 165, 0.7)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 20,
+  },
+  comingSoonSubtitle: {
+    fontFamily: 'Rajdhani-Medium',
+    fontSize: 18,
+    color: '#CBD5E1',
+    textAlign: 'center',
+    paddingHorizontal: 40,
+    lineHeight: 24,
+  },
+  leaveButton: {
+    marginTop: 24,
+    marginBottom: 16,
+  },
+});

@@ -25,12 +25,12 @@ export const modes = [
     color: '#8B5CF6',
     route: '/party-sync' as const,
   },
-  {
-    id: 'visual-effects',
-    title: 'Visual Effects',
-    subtitle: 'Choose your style',
-    icon: Palette,
-    color: '#EF4444',
-    route: '/visual-effects' as const,
-  },
+  // {
+  //   id: 'visual-effects',
+  //   title: 'Visual Effects',
+  //   subtitle: 'Choose your style',
+  //   icon: Palette,
+  //   color: '#EF4444',
+  //   route: '/visual-effects' as const,
+  // },
 ];

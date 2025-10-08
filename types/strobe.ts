@@ -1,5 +1,6 @@
 import { Animated } from 'react-native';
 import { ComponentType } from 'react';
+import { Sparkles, Zap } from 'lucide-react-native';
 
 // Core strobe color interface
 export interface StrobeColor {
@@ -152,10 +153,10 @@ export interface StrobeError {
 
 // Constants
 export const STROBE_EFFECTS: StrobeEffect[] = [
-    { id: 'pulse', name: 'Pulse', icon: require('lucide-react-native').Zap },
-    { id: 'wave', name: 'Wave', icon: require('lucide-react-native').Sparkles },
-    { id: 'burst', name: 'Burst', icon: require('lucide-react-native').Sparkles },
-    { id: 'fade', name: 'Fade', icon: require('lucide-react-native').Sparkles },
+    { id: 'pulse', name: 'Pulse', icon: Zap },
+    { id: 'wave', name: 'Wave', icon: Sparkles },
+    { id: 'burst', name: 'Burst', icon: Sparkles },
+    { id: 'fade', name: 'Fade', icon: Sparkles },
 ];
 
 export const STROBE_COLORS: StrobeColor[] = [

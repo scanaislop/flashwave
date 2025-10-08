@@ -10,16 +10,11 @@ import { modes } from '@/types/modes';
 import { homeStyles } from '@/components/styles/home';
 
 export default function HomeScreen() {
-  const [isDarkMode, setIsDarkMode] = useState(true);
   const [lastUsedMode, setLastUsedMode] = useState('sound-reactive');
 
   const handleModePress = (route: string, modeId: string) => {
     setLastUsedMode(modeId);
     router.push(route as any);
-  };
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
   };
 
   const handleStartLightshow = () => {

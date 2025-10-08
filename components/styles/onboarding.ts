@@ -1,4 +1,5 @@
 import { Dimensions, StyleSheet } from 'react-native';
+import { fonts } from '@/constants/fonts';
 
 export const onboardingStyles = StyleSheet.create({
     container: {
@@ -10,7 +11,7 @@ export const onboardingStyles = StyleSheet.create({
     }, skipButton: {
       flexDirection: 'row', alignItems: 'center', gap: 5
     }, skipText: {
-      color: '#64748B', fontSize: 16, fontFamily: 'Rajdhani-Medium'
+      color: '#64748B', fontSize: 16, fontFamily: fonts.medium
     }, scrollView: {
       flex: 1
     }, slideContainer: {
@@ -28,9 +29,9 @@ export const onboardingStyles = StyleSheet.create({
     }, textContainer: {
       alignItems: 'center', gap: 16
     }, title: {
-      fontSize: 32, fontFamily: 'Orbitron-Bold', color: '#FFFFFF', textAlign: 'center', letterSpacing: 1
+      fontSize: 32, fontFamily: fonts.bold, color: '#FFFFFF', textAlign: 'center', letterSpacing: 1
     }, subtitle: {
-      fontSize: 18, fontFamily: 'Rajdhani-Regular', color: '#94A3B8', textAlign: 'center', lineHeight: 24
+      fontSize: 18, fontFamily: fonts.regular, color: '#94A3B8', textAlign: 'center', lineHeight: 24
     }, footer: {
       paddingHorizontal: 40, paddingBottom: 40, alignItems: 'center', gap: 30
     }, pagination: {

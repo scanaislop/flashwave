@@ -1,38 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Stack, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useFrameworkReady } from '@/hooks/useFrameworkReady';
-import { hasAcceptedCurrentDisclaimer } from '@/utils/storage';
 import { useFonts } from 'expo-font';
 import { TabBarProvider } from '@/context/TabBarContext';
-import {
-  Orbitron_400Regular,
-  Orbitron_700Bold,
-  Orbitron_900Black,
-} from '@expo-google-fonts/orbitron';
-import {
-  Rajdhani_400Regular,
-  Rajdhani_500Medium,
-  Rajdhani_600SemiBold,
-  Rajdhani_700Bold,
-} from '@expo-google-fonts/rajdhani';
+import { useFrameworkReady } from '@/hooks/useFrameworkReady';
+import { hasAcceptedCurrentDisclaimer } from '@/utils/storage';
+import { fontMap } from '@/constants/fonts';
 import * as SplashScreen from 'expo-splash-screen';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   useFrameworkReady();
-  const [disclaimerChecked, setDisclaimerChecked] = useState(false);
-
-  const [fontsLoaded, fontError] = useFonts({
-    'Orbitron-Regular': Orbitron_400Regular,
-    'Orbitron-Bold': Orbitron_700Bold,
-    'Orbitron-Black': Orbitron_900Black,
-    'Rajdhani-Regular': Rajdhani_400Regular,
-    'Rajdhani-Medium': Rajdhani_500Medium,
-    'Rajdhani-SemiBold': Rajdhani_600SemiBold,
-    'Rajdhani-Bold': Rajdhani_700Bold,
-  });
+  const [fontsLoaded, fontError] = useFonts(fontMap);
 
   useEffect(() => {
     if (fontsLoaded || fontError) {
@@ -45,19 +25,17 @@ export default function RootLayout() {
     const checkDisclaimer = async () => {
       try {
         const hasAccepted = await hasAcceptedCurrentDisclaimer();
-        setDisclaimerChecked(true);
         
         // If user hasn't accepted current disclaimer version
         if (!hasAccepted) {
           // We'll redirect to disclaimer and return to tabs after acceptance
           router.replace({
             pathname: '/disclaimer',
-            params: { returnTo: '/(tabs)' }
-          });
+            params: { returnTo: '/(tabs)' },
+          } as never);
         }
       } catch (error) {
         console.error('Error checking disclaimer:', error);
-        setDisclaimerChecked(true);
       }
     };
     

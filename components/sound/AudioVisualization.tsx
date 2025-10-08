@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Animated } from 'react-native';
+import { fonts } from '@/constants/fonts';
 
 interface AudioVisualizationProps {
   bassLevel: number;
@@ -57,7 +58,7 @@ export const AudioVisualization: React.FC<AudioVisualizationProps> = ({
       <View style={{ alignItems: 'center' }}>
         <Text style={{
           fontSize: 48,
-          fontFamily: 'Orbitron-Bold',
+          fontFamily: fonts.bold,
           color: beatDetected ? colors[0] : '#FFFFFF'
         }}>{currentBPM}</Text>
         <Text style={{ fontSize: 16, fontFamily: 'Rajdhani-Bold', color: '#06FFA5' }}>BPM</Text>

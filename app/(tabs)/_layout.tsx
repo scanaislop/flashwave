@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import { Platform } from 'react-native';
-import { House, Mic, Palette, Settings, Users, Zap } from 'lucide-react-native';
+import { House, Mic, Settings, Users, Zap } from 'lucide-react-native';
+import { fonts } from '@/constants/fonts';
 
 export default function TabLayout() {
   return (<Tabs
@@ -13,7 +14,7 @@ export default function TabLayout() {
         paddingBottom: Platform.OS === 'ios' ? 35 : 20,
         paddingTop: 10
       }, tabBarActiveTintColor: '#06FFA5', tabBarInactiveTintColor: '#64748B', tabBarLabelStyle: {
-        fontSize: 12, fontFamily: 'Rajdhani-Medium'
+        fontSize: 12, fontFamily: fonts.medium
       }
     }}>
     <Tabs.Screen

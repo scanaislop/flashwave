@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { fonts } from '@/constants/fonts';
 
 export const manualStyles = StyleSheet.create({
   container: {
@@ -22,13 +23,13 @@ export const manualStyles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontFamily: 'Orbitron-Bold',
+    fontFamily: fonts.bold,
     color: '#FFFFFF',
     letterSpacing: 1,
   },
   subtitle: {
     fontSize: 16,
-    fontFamily: 'Rajdhani-Regular',
+    fontFamily: fonts.regular,
     color: '#94A3B8',
     marginTop: 4,
   },
@@ -56,7 +57,7 @@ export const manualStyles = StyleSheet.create({
   },
   modeText: {
     fontSize: 16,
-    fontFamily: 'Rajdhani-Medium',
+    fontFamily: fonts.medium,
     color: '#64748B',
   },
   activeModeText: {
@@ -65,7 +66,7 @@ export const manualStyles = StyleSheet.create({
   speedContainer: {},
   speedLabel: {
     fontSize: 16,
-    fontFamily: 'Rajdhani-Medium',
+    fontFamily: fonts.medium,
     color: '#FFFFFF',
   },
   slider: {
@@ -122,7 +123,7 @@ export const manualStyles = StyleSheet.create({
   },
   timerLabel: {
     fontSize: 14,
-    fontFamily: 'Rajdhani-Medium',
+    fontFamily: fonts.medium,
     color: '#FFFFFF',
     marginBottom: 8,
   },
@@ -144,7 +145,7 @@ export const manualStyles = StyleSheet.create({
   },
   tapToFlashText: {
     fontSize: 20,
-    fontFamily: 'Orbitron-Bold',
+    fontFamily: fonts.bold,
     color: '#FFFFFF',
     letterSpacing: 1,
   },

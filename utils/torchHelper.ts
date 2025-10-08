@@ -1,4 +1,3 @@
-import { Platform } from 'react-native';
 import Torch from 'react-native-torch';
 
 /**

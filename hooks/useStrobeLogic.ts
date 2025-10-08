@@ -1,112 +1,43 @@
 import { useEffect, useCallback, useRef } from 'react';
-import { Animated } from 'react-native';
-import { UseStrobeLogicProps } from '@/types/strobe';
+import { Animated, Platform } from 'react-native';
 import Torch from 'react-native-torch';
-import { Platform } from 'react-native';
+import { UseStrobeLogicProps } from '@/types/strobe';
+import { runBurstEffect, runFadeEffect, runPulseEffect, runWaveEffect } from '@/utils/strobeEffects';
 
-export const useStrobeLogic = ({ 
-  settings, 
-  animations, 
-  intervals, 
-  setCurrentColorIndex 
+export const useStrobeLogic = ({
+  settings,
+  animations,
+  intervals,
+  setCurrentColorIndex,
 }: UseStrobeLogicProps) => {
   const isMounted = useRef(true);
-
-  // Animation effect creators
-  const createPulseEffect = useCallback(() => {
-    Animated.sequence([
-      Animated.timing(animations.flashAnimation, {
-        toValue: 1, duration: 40, useNativeDriver: false
-      }),
-      Animated.timing(animations.flashAnimation, {
-        toValue: 0, duration: 80, useNativeDriver: false
-      })
-    ]).start();
-  }, [animations.flashAnimation]);
-
-  const createWaveEffect = useCallback((count: number) => {
-    const intensity = 0.7 + (count % 4) * 0.1;
-    Animated.sequence([
-      Animated.timing(animations.flashAnimation, {
-        toValue: intensity, duration: 60, useNativeDriver: false
-      }),
-      Animated.timing(animations.flashAnimation, {
-        toValue: 0, duration: 120, useNativeDriver: false
-      })
-    ]).start();
-  }, [animations.flashAnimation]);
-
-  const createBurstEffect = useCallback(() => {
-    Animated.sequence([
-      Animated.timing(animations.flashAnimation, {
-        toValue: 1, duration: 30, useNativeDriver: false
-      }),
-      Animated.timing(animations.flashAnimation, {
-        toValue: 0, duration: 30, useNativeDriver: false
-      }),
-      Animated.timing(animations.flashAnimation, {
-        toValue: 0.8, duration: 30, useNativeDriver: false
-      }),
-      Animated.timing(animations.flashAnimation, {
-        toValue: 0, duration: 30, useNativeDriver: false
-      }),
-      Animated.timing(animations.flashAnimation, {
-        toValue: 0.6, duration: 30, useNativeDriver: false
-      }),
-      Animated.timing(animations.flashAnimation, {
-        toValue: 0, duration: 60, useNativeDriver: false
-      })
-    ]).start();
-    
-    Animated.sequence([
-      Animated.timing(animations.burstAnimation, {
-        toValue: 1, duration: 200, useNativeDriver: false
-      }),
-      Animated.timing(animations.burstAnimation, {
-        toValue: 0, duration: 300, useNativeDriver: false
-      })
-    ]).start();
-  }, [animations.flashAnimation, animations.burstAnimation]);
-
-  const createFadeEffect = useCallback(() => {
-    Animated.sequence([
-      Animated.timing(animations.flashAnimation, {
-        toValue: 0.9, duration: 100, useNativeDriver: false
-      }),
-      Animated.timing(animations.flashAnimation, {
-        toValue: 0.3, duration: 200, useNativeDriver: false
-      }),
-      Animated.timing(animations.flashAnimation, {
-        toValue: 0, duration: 300, useNativeDriver: false
-      })
-    ]).start();
-  }, [animations.flashAnimation]);
+  const { strobeInterval, flashlightInterval, colorCycleLoop } = intervals;
 
   // Main strobe effect runner
   const startStrobeEffect = useCallback(() => {
-    if (intervals.strobeInterval.current) {
-      clearInterval(intervals.strobeInterval.current);
+    if (strobeInterval.current) {
+      clearInterval(strobeInterval.current);
     }
 
     const baseInterval = Math.max(50, 1000 - settings.strobeSpeed * 950);
     let flashCount = 0;
 
-    intervals.strobeInterval = setInterval(() => {
+    strobeInterval.current = setInterval(() => {
       if (!isMounted.current) return;
       
       flashCount++;
       switch (settings.selectedEffect) {
         case 0:
-          createPulseEffect();
+          runPulseEffect(animations);
           break;
         case 1:
-          createWaveEffect(flashCount);
+          runWaveEffect(animations, flashCount);
           break;
         case 2:
-          createBurstEffect();
+          runBurstEffect(animations);
           break;
         case 3:
-          createFadeEffect();
+          runFadeEffect(animations);
           break;
       }
 
@@ -115,18 +46,25 @@ export const useStrobeLogic = ({
         // @ts-ignore
         setCurrentColorIndex((prev) => (prev + 1) % 6);
       }
-    }, baseInterval) as any;
-  }, [settings.strobeSpeed, settings.selectedEffect, settings.selectedColor, intervals.strobeInterval, createPulseEffect, createWaveEffect, createBurstEffect, createFadeEffect, setCurrentColorIndex]);
+    }, baseInterval) as unknown as NodeJS.Timeout;
+  }, [
+    settings.strobeSpeed,
+    settings.selectedEffect,
+    settings.selectedColor,
+    animations,
+    strobeInterval,
+    setCurrentColorIndex,
+  ]);
 
   // Flashlight strobe effect
   const startFlashlightStrobe = useCallback(() => {
-    if (intervals.flashlightInterval.current) {
-      clearInterval(intervals.flashlightInterval.current);
+    if (flashlightInterval.current) {
+      clearInterval(flashlightInterval.current);
     }
 
     const baseInterval = Math.max(50, 1000 - settings.strobeSpeed * 950);
-    
-    intervals.flashlightInterval = setInterval(async () => {
+
+    flashlightInterval.current = setInterval(async () => {
       if (!isMounted.current) return;
       
       try {
@@ -141,8 +79,8 @@ export const useStrobeLogic = ({
       } catch (error) {
         console.log('Flashlight strobe error:', error);
       }
-    }, baseInterval) as any;
-  }, [settings.strobeSpeed, intervals.flashlightInterval]);
+    }, baseInterval) as unknown as NodeJS.Timeout;
+  }, [flashlightInterval, settings.strobeSpeed]);
 
   // Sustained glow effect
   const startSustainedEffect = useCallback(() => {
@@ -160,17 +98,17 @@ export const useStrobeLogic = ({
 
   // Stop all effects
   const stopStrobeEffect = useCallback(() => {
-    if (intervals.strobeInterval.current) {
-      clearInterval(intervals.strobeInterval.current);
-      intervals.strobeInterval.current = null;
+    if (strobeInterval.current) {
+      clearInterval(strobeInterval.current);
+      strobeInterval.current = null;
     }
     animations.flashAnimation.setValue(0);
-  }, [animations.flashAnimation, intervals.strobeInterval]);
+  }, [animations.flashAnimation, strobeInterval]);
 
   const stopFlashlightStrobe = useCallback(async () => {
-    if (intervals.flashlightInterval.current) {
-      clearInterval(intervals.flashlightInterval.current);
-      intervals.flashlightInterval.current = null;
+    if (flashlightInterval.current) {
+      clearInterval(flashlightInterval.current);
+      flashlightInterval.current = null;
     }
     if (Platform.OS !== 'web' && Torch && Torch.switchState) {
       try {
@@ -179,7 +117,7 @@ export const useStrobeLogic = ({
         console.log('Error turning off flashlight:', error);
       }
     }
-  }, [intervals.flashlightInterval]);
+  }, [flashlightInterval]);
 
   const stopSustainedEffect = useCallback(() => {
     animations.sustainedAnimation.setValue(0);
@@ -207,8 +145,8 @@ export const useStrobeLogic = ({
   // Color cycle animation for rainbow mode
   useEffect(() => {
     if (settings.selectedColor === 6) {
-      if (intervals.colorCycleLoop.current) {
-        intervals.colorCycleLoop.current.stop();
+      if (colorCycleLoop.current) {
+        colorCycleLoop.current.stop();
       }
       
       const loop = Animated.loop(
@@ -217,30 +155,30 @@ export const useStrobeLogic = ({
         })
       );
       loop.start();
-      intervals.colorCycleLoop.current = loop;
+      colorCycleLoop.current = loop;
     } else {
-      if (intervals.colorCycleLoop.current) {
-        intervals.colorCycleLoop.current.stop();
-        intervals.colorCycleLoop.current = null;
+      if (colorCycleLoop.current) {
+        colorCycleLoop.current.stop();
+        colorCycleLoop.current = null;
       }
     }
-  }, [settings.selectedColor, animations.colorCycleAnimation, intervals.colorCycleLoop]);
+  }, [animations.colorCycleAnimation, colorCycleLoop, settings.selectedColor]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       isMounted.current = false;
-      if (intervals.strobeInterval.current) {
-        clearInterval(intervals.strobeInterval.current);
+      if (strobeInterval.current) {
+        clearInterval(strobeInterval.current);
       }
-      if (intervals.flashlightInterval.current) {
-        clearInterval(intervals.flashlightInterval.current);
+      if (flashlightInterval.current) {
+        clearInterval(flashlightInterval.current);
       }
-      if (intervals.colorCycleLoop.current) {
-        intervals.colorCycleLoop.current.stop();
+      if (colorCycleLoop.current) {
+        colorCycleLoop.current.stop();
       }
     };
-  }, [intervals]);
+  }, [colorCycleLoop, flashlightInterval, strobeInterval]);
 
   return {
     startStrobeEffect,

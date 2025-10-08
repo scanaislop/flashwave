@@ -21,7 +21,7 @@ export default function AnimatedWave({ intensity = 1, color = '#06FFA5' }: Anima
 
   useEffect(() => {
     waveAnimation.value = withRepeat(withTiming(1, { duration: 2000 }), -1, true);
-  }, []);
+  }, [waveAnimation]);
 
   const animatedStyle = useAnimatedStyle(() => {
     const scale = interpolate(waveAnimation.value, [0, 1], [0.8, 1.2 * intensity]);

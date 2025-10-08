@@ -30,6 +30,7 @@ export const useAudioPermissions = () => {
         await navigator.mediaDevices.getUserMedia({ audio: true });
         setAudioPermission(true);
       } catch (error) {
+        console.error('Microphone permission denied:', error);
         Alert.alert('Permission Denied', 'Microphone access is required for sound reactive mode.');
       }
     }

@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import GlowButton from '@/components/shared/GlowButton';
 import NeonContainer from '@/components/shared/NeonContainer';
 import { AlertTriangle } from 'lucide-react-native';
+import { fonts } from '@/constants/fonts';
 
 export default function DisclaimerScreen() {
     const { returnTo } = useLocalSearchParams();
@@ -86,7 +87,7 @@ export default function DisclaimerScreen() {
                         </Text>
 
                         <Text style={styles.disclaimerText}>
-                            PARENTS SHOULD MONITOR their children's use of this application. If you or your child experience any of the symptoms listed above, IMMEDIATELY STOP using this application and consult a doctor.
+                            PARENTS SHOULD MONITOR their children&apos;s use of this application. If you or your child experience any of the symptoms listed above, IMMEDIATELY STOP using this application and consult a doctor.
                         </Text>
 
                         <Text style={styles.disclaimerText}>
@@ -138,7 +139,7 @@ const styles = StyleSheet.create({
         gap: 10,
     },
     title: {
-        fontFamily: 'Orbitron-Bold',
+        fontFamily: fonts.bold,
         fontSize: 24,
         color: '#F59E0B',
         textAlign: 'center',
@@ -154,14 +155,14 @@ const styles = StyleSheet.create({
         // padding: 20,
     },
     warningText: {
-        fontFamily: 'Orbitron-Bold',
+        fontFamily: fonts.bold,
         fontSize: 18,
         color: '#F59E0B',
         marginBottom: 20,
         textAlign: 'center',
     },
     disclaimerText: {
-        fontFamily: 'Rajdhani-Medium',
+        fontFamily: fonts.medium,
         fontSize: 16,
         color: '#FFFFFF',
         marginBottom: 20,
@@ -175,7 +176,7 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     scrollPrompt: {
-        fontFamily: 'Rajdhani-Medium',
+        fontFamily: fonts.medium,
         fontSize: 14,
         color: '#F59E0B',
         marginTop: 10,

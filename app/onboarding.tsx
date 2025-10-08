@@ -23,12 +23,12 @@ export default function OnboardingScreen() {
         x: nextIndex * width, animated: true
       });
     } else {
-      router.replace('/disclaimer');
+      router.replace('/disclaimer' as never);
     }
   };
 
   const handleSkip = () => {
-    router.replace('/disclaimer');
+    router.replace('/disclaimer' as never);
   };
 
   const handleScroll = (event: any) => {

@@ -7,13 +7,13 @@ import NeonContainer from '@/components/shared/NeonContainer';
 import AnimatedWave from '@/components/shared/AnimatedWave';
 import * as Haptics from 'expo-haptics';
 import { customColors, lightEffects } from '@/constants/color';
-import { virtualEffectsStyles } from '@/components/styles/virtual-effects';
+import { virtualEffectsStyles } from '@/components/styles/virtualEffects';
 
 export default function VisualEffectsScreen() {
   const [selectedEffect, setSelectedEffect] = useState(0);
   const [selectedColors, setSelectedColors] = useState([0, 1, 2]);
   const [isCustomMode, setIsCustomMode] = useState(false);
-  const [savedPresets, setSavedPresets] = useState([]);
+  const [savedPresets] = useState<string[]>([]);
 
   const handleEffectSelect = (index: number) => {
     if (Platform.OS !== 'web') {

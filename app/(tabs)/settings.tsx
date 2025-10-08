@@ -1,59 +1,61 @@
-import NeonContainer from '@/components/shared/NeonContainer';
-import { settingsStyles } from '@/components/styles/settings';
-import Slider from '@react-native-community/slider';
-import * as Haptics from 'expo-haptics';
+import { useCallback, useState } from 'react';
+import { Alert, ScrollView, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
-import { AlertTriangle, Info, MessageSquare, Moon, Shield, Smartphone, Sun } from 'lucide-react-native';
-import React, { useState } from 'react';
-import { Alert, Platform, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
+import { AlertTriangle, Info, MessageSquare, Shield } from 'lucide-react-native';
+import { settingsStyles } from '@/components/styles/settings';
+import { SettingSection } from '@/components/settings/SettingSection';
+import { SettingSwitchRow } from '@/components/settings/SettingSwitchRow';
+import { SettingSliderRow } from '@/components/settings/SettingSliderRow';
+import { SupportLink } from '@/components/settings/SupportLink';
+import { ImpactStyles, triggerImpact } from '@/utils/haptics';
+
+const gradientColors: readonly [string, string] = ['#0A0A0F', '#1A1A2E'];
 
 export default function SettingsScreen() {
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('dark');
-  const [defaultMode, setDefaultMode] = useState('sound-reactive');
   const [flashlightDefault, setFlashlightDefault] = useState(true);
-  const [safetyTimer, setSafetyTimer] = useState(15);
   const [safetyTimerEnabled, setSafetyTimerEnabled] = useState(true);
+  const [safetyTimer, setSafetyTimer] = useState(15);
+  const [lowBatteryMode, setLowBatteryMode] = useState(false);
   const [hapticFeedback, setHapticFeedback] = useState(true);
   const [keepScreenOn, setKeepScreenOn] = useState(true);
-  const [lowBatteryMode, setLowBatteryMode] = useState(false);
 
-  const handleThemeChange = (newTheme: 'light' | 'dark' | 'system') => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    setTheme(newTheme);
-  };
+  const handleSwitch = useCallback(<T extends boolean>(setter: (value: T) => void) => {
+    return (value: T) => {
+      triggerImpact(ImpactStyles.Light);
+      setter(value);
+    };
+  }, []);
 
-  const handleModeChange = (mode: string) => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    setDefaultMode(mode);
+  const handleTimerChange = (value: number) => {
+    triggerImpact(ImpactStyles.Light);
+    setSafetyTimer(value);
   };
 
   const sendFeedback = () => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    }
-    Alert.alert('Send Feedback', 'Would you like to send feedback about Flashwave?', [{
-      text: 'Cancel',
-      style: 'cancel'
-    }, {
-      text: 'Send Email', onPress: () => {
-      }
-    }]);
+    triggerImpact(ImpactStyles.Medium);
+    Alert.alert('Send Feedback', 'Would you like to send feedback about Flashwave?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Send Email', onPress: () => {} },
+    ]);
   };
 
   const showAppInfo = () => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    Alert.alert('Flashwave v1.0.0', 'The ultimate party light show app. Transform your phone into a synchronized light controller for epic events.\n\nMade with ❤️ for party lovers everywhere.', [{ text: 'OK' }]);
+    triggerImpact(ImpactStyles.Light);
+    Alert.alert(
+      'Flashwave v1.0.0',
+      'The ultimate party light show app. Transform your phone into a synchronized light controller for epic events.\n\nMade with ❤️ for party lovers everywhere.',
+    );
   };
 
-  return (<LinearGradient colors={['#0A0A0F', '#1A1A2E']} style={settingsStyles.container}>
+  const viewDisclaimer = () => {
+    triggerImpact(ImpactStyles.Light);
+    router.push('/disclaimer' as never);
+  };
+
+  return (
+    <LinearGradient colors={gradientColors} style={settingsStyles.container}>
       <SafeAreaView style={settingsStyles.safeArea} edges={['right', 'left', 'top']}>
         <View style={settingsStyles.header}>
           <Text style={settingsStyles.title}>Settings</Text>
@@ -61,166 +63,95 @@ export default function SettingsScreen() {
         </View>
 
         <ScrollView style={settingsStyles.content} showsVerticalScrollIndicator={false}>
-          {/* Default Settings */}
-          <NeonContainer style={settingsStyles.section}>
-            <Text style={settingsStyles.sectionTitle}>Default Settings</Text>
+          <SettingSection title="Default Settings">
+            <SettingSwitchRow
+              label="Flashlight Default"
+              value={flashlightDefault}
+              onChange={handleSwitch(setFlashlightDefault)}
+              description="Enable flashlight by default when starting modes"
+              trackColor={{ false: '#64748B', true: '#8B5CF6' }}
+            />
+          </SettingSection>
 
-            <View style={settingsStyles.settingItem}>
-              <View style={settingsStyles.settingRow}>
-                <Text style={settingsStyles.settingLabel}>Flashlight Default</Text>
-                <Switch
-                  value={flashlightDefault}
-                  onValueChange={setFlashlightDefault}
-                  trackColor={{ false: '#64748B', true: '#8B5CF6' }}
-                  thumbColor="#FFFFFF"
-                />
-              </View>
-              <Text style={settingsStyles.settingDescription}>
-                Enable flashlight by default when starting modes
-              </Text>
-            </View>
-          </NeonContainer>
+          <SettingSection title="Safety" icon={<Shield size={20} color="#F59E0B" />} glowColor="#F59E0B">
+            <SettingSwitchRow
+              label="Auto-Stop Timer"
+              value={safetyTimerEnabled}
+              onChange={handleSwitch(setSafetyTimerEnabled)}
+              description="Automatically stop light shows to prevent eye strain and save battery"
+              trackColor={{ false: '#64748B', true: '#F59E0B' }}
+            />
 
-          {/* Safety */}
-          <NeonContainer style={settingsStyles.section} glowColor="#F59E0B">
-            <View style={settingsStyles.sectionHeader}>
-              <Shield size={20} color="#F59E0B" />
-              <Text style={settingsStyles.sectionTitle}>Safety</Text>
-            </View>
+            {safetyTimerEnabled && (
+              <SettingSliderRow
+                label={`Timer Duration: ${safetyTimer} minutes`}
+                value={safetyTimer}
+                onChange={handleTimerChange}
+                minLabel="5 min"
+                maxLabel="60 min"
+                minimumValue={5}
+                maximumValue={60}
+                step={5}
+                trackColor="#F59E0B"
+              />
+            )}
 
-            <View style={settingsStyles.settingItem}>
-              <View style={settingsStyles.settingRow}>
-                <Text style={settingsStyles.settingLabel}>Auto-Stop Timer</Text>
-                <Switch
-                  value={safetyTimerEnabled}
-                  onValueChange={setSafetyTimerEnabled}
-                  trackColor={{ false: '#64748B', true: '#F59E0B' }}
-                  thumbColor="#FFFFFF"
-                />
-              </View>
-              <Text style={settingsStyles.settingDescription}>
-                Automatically stop light shows to prevent eye strain and save battery
-              </Text>
-            </View>
+            <SettingSwitchRow
+              label="Low Battery Mode"
+              value={lowBatteryMode}
+              onChange={handleSwitch(setLowBatteryMode)}
+              description="Reduce effects intensity when battery is below 20%"
+              trackColor={{ false: '#64748B', true: '#F59E0B' }}
+            />
 
-            {safetyTimerEnabled && (<View style={settingsStyles.settingItem}>
-                <Text style={settingsStyles.settingLabel}>
-                  Timer Duration: {safetyTimer} minutes
-                </Text>
-                <Slider
-                  style={settingsStyles.slider}
-                  minimumValue={5}
-                  maximumValue={60}
-                  step={5}
-                  value={safetyTimer}
-                  onValueChange={setSafetyTimer}
-                  minimumTrackTintColor="#F59E0B"
-                  maximumTrackTintColor="#64748B"
-                  // thumbStyle={{ backgroundColor: '#F59E0B' }}
-                />
-                <View style={settingsStyles.sliderLabels}>
-                  <Text style={settingsStyles.sliderLabel}>5 min</Text>
-                  <Text style={settingsStyles.sliderLabel}>60 min</Text>
-                </View>
-              </View>)}
+            <SupportLink
+              icon={<AlertTriangle size={20} color="#F59E0B" />}
+              title="View Safety Disclaimer"
+              description="Review important photosensitivity warnings"
+              onPress={viewDisclaimer}
+            />
+          </SettingSection>
 
-            <View style={settingsStyles.settingItem}>
-              <View style={settingsStyles.settingRow}>
-                <Text style={settingsStyles.settingLabel}>Low Battery Mode</Text>
-                <Switch
-                  value={lowBatteryMode}
-                  onValueChange={setLowBatteryMode}
-                  trackColor={{ false: '#64748B', true: '#F59E0B' }}
-                  thumbColor="#FFFFFF"
-                />
-              </View>
-              <Text style={settingsStyles.settingDescription}>
-                Reduce effects intensity when battery is below 20%
-              </Text>
-            </View>
+          <SettingSection title="Experience">
+            <SettingSwitchRow
+              label="Haptic Feedback"
+              value={hapticFeedback}
+              onChange={handleSwitch(setHapticFeedback)}
+              description="Feel the beat with vibration feedback"
+              trackColor={{ false: '#64748B', true: '#06FFA5' }}
+            />
 
-            <TouchableOpacity 
-              onPress={() => router.push('/disclaimer')} 
-              style={settingsStyles.supportItem}>
-              <AlertTriangle size={20} color="#F59E0B" />
-              <View style={settingsStyles.supportText}>
-                <Text style={settingsStyles.supportTitle}>View Safety Disclaimer</Text>
-                <Text style={settingsStyles.supportDescription}>
-                  Review important photosensitivity warnings
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </NeonContainer>
+            <SettingSwitchRow
+              label="Keep Screen On"
+              value={keepScreenOn}
+              onChange={handleSwitch(setKeepScreenOn)}
+              description="Prevent screen from dimming during light shows"
+              trackColor={{ false: '#64748B', true: '#06FFA5' }}
+            />
+          </SettingSection>
 
-          {/* Experience */}
-          <NeonContainer style={settingsStyles.section}>
-            <Text style={settingsStyles.sectionTitle}>Experience</Text>
+          <SettingSection title="Support" variant="subtle">
+            <SupportLink
+              icon={<MessageSquare size={20} color="#8B5CF6" />}
+              title="Send Feedback"
+              description="Help us improve Flashwave"
+              onPress={sendFeedback}
+            />
 
-            <View style={settingsStyles.settingItem}>
-              <View style={settingsStyles.settingRow}>
-                <Text style={settingsStyles.settingLabel}>Haptic Feedback</Text>
-                <Switch
-                  value={hapticFeedback}
-                  onValueChange={setHapticFeedback}
-                  trackColor={{ false: '#64748B', true: '#06FFA5' }}
-                  thumbColor="#FFFFFF"
-                />
-              </View>
-              <Text style={settingsStyles.settingDescription}>
-                Feel the beat with vibration feedback
-              </Text>
-            </View>
-
-            <View style={settingsStyles.settingItem}>
-              <View style={settingsStyles.settingRow}>
-                <Text style={settingsStyles.settingLabel}>Keep Screen On</Text>
-                <Switch
-                  value={keepScreenOn}
-                  onValueChange={setKeepScreenOn}
-                  trackColor={{ false: '#64748B', true: '#06FFA5' }}
-                  thumbColor="#FFFFFF"
-                />
-              </View>
-              <Text style={settingsStyles.settingDescription}>
-                Prevent screen from dimming during light shows
-              </Text>
-            </View>
-          </NeonContainer>
-
-          {/* Support */}
-          <NeonContainer style={settingsStyles.section} variant="subtle">
-            <Text style={settingsStyles.sectionTitle}>Support</Text>
-
-            <TouchableOpacity onPress={sendFeedback} style={settingsStyles.supportItem}>
-              <MessageSquare size={20} color="#8B5CF6" />
-              <View style={settingsStyles.supportText}>
-                <Text style={settingsStyles.supportTitle}>Send Feedback</Text>
-                <Text style={settingsStyles.supportDescription}>
-                  Help us improve Flashwave
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={showAppInfo} style={settingsStyles.supportItem}>
-              <Info size={20} color="#06FFA5" />
-              <View style={settingsStyles.supportText}>
-                <Text style={settingsStyles.supportTitle}>App Info</Text>
-                <Text style={settingsStyles.supportDescription}>
-                  Version and credits
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </NeonContainer>
+            <SupportLink
+              icon={<Info size={20} color="#06FFA5" />}
+              title="App Info"
+              description="Version and credits"
+              onPress={showAppInfo}
+            />
+          </SettingSection>
 
           <View style={settingsStyles.footer}>
-            <Text style={settingsStyles.footerText}>
-              Flashwave v1.0.0
-            </Text>
-            <Text style={settingsStyles.footerSubtext}>
-              Made for party enthusiasts 🎉
-            </Text>
+            <Text style={settingsStyles.footerText}>Flashwave v1.0.0</Text>
+            <Text style={settingsStyles.footerSubtext}>Made for party enthusiasts 🎉</Text>
           </View>
         </ScrollView>
       </SafeAreaView>
-    </LinearGradient>);
+    </LinearGradient>
+  );
 }

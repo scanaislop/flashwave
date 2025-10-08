@@ -2,10 +2,15 @@
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { Animated } from 'react-native';
 
-export const useUIControls = () => {
+interface UIControlsParams {
+  controlsOpacity?: Animated.Value;
+  toggleIconOpacity?: Animated.Value;
+}
+
+export const useUIControls = (params: UIControlsParams = {}) => {
   const [showControls, setShowControls] = useState(true);
-  const controlsOpacity = useRef(new Animated.Value(1)).current;
-  const toggleIconOpacity = useRef(new Animated.Value(0)).current;
+  const controlsOpacity = useRef(params.controlsOpacity ?? new Animated.Value(1)).current;
+  const toggleIconOpacity = useRef(params.toggleIconOpacity ?? new Animated.Value(0)).current;
   const hideControlsTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const hideControls = useCallback(() => {

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Platform, StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
+import { StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
+import { ImpactStyles, triggerImpact } from '@/utils/haptics';
 
 interface GlowButtonProps {
   title: string;
@@ -23,9 +23,7 @@ export default function GlowButton({
   disabled = false
 }: GlowButtonProps) {
   const handlePress = () => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    }
+    triggerImpact(ImpactStyles.Medium);
     onPress();
   };
 

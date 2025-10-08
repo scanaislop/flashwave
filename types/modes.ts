@@ -1,4 +1,4 @@
-import { Mic, Zap, Users, Palette, Moon, Sun } from 'lucide-react-native';
+import { Mic, Zap, Users } from 'lucide-react-native';
 
 export const modes = [
   {

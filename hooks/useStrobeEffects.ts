@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { Animated, Platform } from 'react-native';
 import * as Haptics from 'expo-haptics';
 
@@ -138,7 +138,7 @@ export const useStrobeEffects = (
     }
   };
 
-  const stopEffects = () => {
+  const stopEffects = useCallback(() => {
     flashAnimation.stopAnimation();
     waveAnimation.stopAnimation();
     burstAnimation.stopAnimation();
@@ -148,13 +148,13 @@ export const useStrobeEffects = (
     waveAnimation.setValue(0);
     burstAnimation.setValue(0);
     sustainedAnimation.setValue(0);
-  };
+  }, [burstAnimation, flashAnimation, sustainedAnimation, waveAnimation]);
 
   useEffect(() => {
     if (!isListening) {
       stopEffects();
     }
-  }, [isListening]);
+  }, [isListening, stopEffects]);
 
   return {
     flashAnimation,

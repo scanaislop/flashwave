@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { fonts } from '@/constants/fonts';
 
 export const homeStyles = StyleSheet.create({
   container: {
@@ -23,7 +24,7 @@ export const homeStyles = StyleSheet.create({
   },
   tagline: {
     fontSize: 14,
-    fontFamily: 'Rajdhani-Regular',
+    fontFamily: fonts.regular,
     color: '#94A3B8',
     marginTop: 2,
   },
@@ -40,7 +41,7 @@ export const homeStyles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 18,
-    fontFamily: 'Rajdhani-Regular',
+    fontFamily: fonts.regular,
     color: '#94A3B8',
     textAlign: 'center',
     marginBottom: 30,
@@ -55,7 +56,7 @@ export const homeStyles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 22,
-    fontFamily: 'Orbitron-Bold',
+    fontFamily: fonts.bold,
     color: '#FFFFFF',
     marginBottom: 20,
     letterSpacing: 1,
@@ -110,7 +111,7 @@ export const homeStyles = StyleSheet.create({
   },
   modeSubtitle: {
     fontSize: 13,
-    fontFamily: 'Rajdhani-Regular',
+    fontFamily: fonts.regular,
     color: '#94A3B8',
     lineHeight: 16,
   },
@@ -125,7 +126,7 @@ export const homeStyles = StyleSheet.create({
   },
   infoText: {
     fontSize: 14,
-    fontFamily: 'Rajdhani-Regular',
+    fontFamily: fonts.regular,
     color: '#94A3B8',
     lineHeight: 20,
   },

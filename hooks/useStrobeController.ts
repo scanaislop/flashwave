@@ -74,6 +74,8 @@ export const useStrobeController = () => {
     toggleIconOpacity,
     handleToggleControls,
     handleScreenTap,
+    showControlsTemporarily,
+    showControlsPermanently,
   } = useUIControls({
     controlsOpacity: animations.controlsOpacity,
     toggleIconOpacity: animations.toggleIconOpacity,
@@ -120,6 +122,14 @@ export const useStrobeController = () => {
     startFlashlightStrobe,
     stopFlashlightStrobe,
   ]);
+
+  useEffect(() => {
+    if (settings.isStrobing) {
+      showControlsTemporarily();
+    } else {
+      showControlsPermanently();
+    }
+  }, [settings.isStrobing, showControlsTemporarily, showControlsPermanently]);
 
   useEffect(() => {
     if (!settings.isStrobing) return;

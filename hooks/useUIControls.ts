@@ -1,4 +1,3 @@
-// hooks/useUIControls.ts
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { Animated } from 'react-native';
 

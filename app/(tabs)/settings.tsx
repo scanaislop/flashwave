@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { Alert, Platform, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Slider from '@react-native-community/slider';
 import NeonContainer from '@/components/shared/NeonContainer';
-import { Flashlight, Info, MessageSquare, Moon, Palette, Shield, Smartphone, Sun, Volume2 } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
-import { modes } from '@/types/modes';
 import { settingsStyles } from '@/components/styles/settings';
+import Slider from '@react-native-community/slider';
+import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
+import { AlertTriangle, Info, MessageSquare, Moon, Shield, Smartphone, Sun } from 'lucide-react-native';
+import React, { useState } from 'react';
+import { Alert, Platform, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('dark');
@@ -61,54 +61,9 @@ export default function SettingsScreen() {
         </View>
 
         <ScrollView style={settingsStyles.content} showsVerticalScrollIndicator={false}>
-          {/* Appearance */}
-          <NeonContainer style={settingsStyles.section}>
-            <Text style={settingsStyles.sectionTitle}>Appearance</Text>
-
-            <View style={settingsStyles.settingItem}>
-              <Text style={settingsStyles.settingLabel}>Theme</Text>
-              <View style={settingsStyles.themeOptions}>
-                {[{ key: 'light', label: 'Light', icon: Sun }, {
-                  key: 'dark',
-                  label: 'Dark',
-                  icon: Moon
-                }, { key: 'system', label: 'System', icon: Smartphone }].map((option) => (<TouchableOpacity
-                    key={option.key}
-                    onPress={() => handleThemeChange(option.key as any)}
-                    style={[settingsStyles.themeOption, theme === option.key && settingsStyles.activeThemeOption]}>
-                    <option.icon
-                      size={16}
-                      color={theme === option.key ? '#06FFA5' : '#64748B'}
-                    />
-                    <Text style={[settingsStyles.themeOptionText, theme === option.key && settingsStyles.activeThemeOptionText]}>
-                      {option.label}
-                    </Text>
-                  </TouchableOpacity>))}
-              </View>
-            </View>
-          </NeonContainer>
-
           {/* Default Settings */}
           <NeonContainer style={settingsStyles.section}>
             <Text style={settingsStyles.sectionTitle}>Default Settings</Text>
-
-            <View style={settingsStyles.settingItem}>
-              <Text style={settingsStyles.settingLabel}>Default Mode</Text>
-              <View style={settingsStyles.modeOptions}>
-                {modes.map((mode) => (<TouchableOpacity
-                    key={mode.id}
-                    onPress={() => handleModeChange(mode.id)}
-                    style={[settingsStyles.modeOption, defaultMode === mode.id && settingsStyles.activeModeOption]}>
-                    <mode.icon
-                      size={16}
-                      color={defaultMode === mode.id ? '#8B5CF6' : '#64748B'}
-                    />
-                    <Text style={[settingsStyles.modeOptionText, defaultMode === mode.id && settingsStyles.activeModeOptionText]}>
-                      {mode.title}
-                    </Text>
-                  </TouchableOpacity>))}
-              </View>
-            </View>
 
             <View style={settingsStyles.settingItem}>
               <View style={settingsStyles.settingRow}>
@@ -183,6 +138,18 @@ export default function SettingsScreen() {
                 Reduce effects intensity when battery is below 20%
               </Text>
             </View>
+
+            <TouchableOpacity 
+              onPress={() => router.push('/disclaimer')} 
+              style={settingsStyles.supportItem}>
+              <AlertTriangle size={20} color="#F59E0B" />
+              <View style={settingsStyles.supportText}>
+                <Text style={settingsStyles.supportTitle}>View Safety Disclaimer</Text>
+                <Text style={settingsStyles.supportDescription}>
+                  Review important photosensitivity warnings
+                </Text>
+              </View>
+            </TouchableOpacity>
           </NeonContainer>
 
           {/* Experience */}

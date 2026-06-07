@@ -1,0 +1,108 @@
+import { StyleSheet } from "react-native";
+import { fonts } from '@/constants/fonts';
+
+export const wordDisplayStyles = StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    safeArea: {
+      flex: 1,
+    },
+    contentArea: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    topBar: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      paddingHorizontal: 20,
+      paddingTop: 24,
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+      gap: 14,
+      zIndex: 5,
+    },
+    exitButton: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: 'rgba(0,0,0,0.4)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.4)',
+    },
+  wordWrapper: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 32,
+  },
+  landscapeStage: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    paddingHorizontal: 32,
+  },
+    wordText: {
+      fontSize: 32,
+      fontFamily: fonts.orbitron.bold,
+      textAlign: 'center',
+      letterSpacing: 2,
+      textTransform: 'uppercase',
+      includeFontPadding: false,
+      textAlignVertical: 'center',
+    },
+    fontControlsRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      backgroundColor: 'rgba(0, 0, 0, 0.35)',
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 28,
+      borderWidth: 1,
+      borderColor: 'rgba(255, 255, 255, 0.25)',
+    },
+    fontControlButton: {
+      width: 38,
+      height: 38,
+      borderRadius: 19,
+      backgroundColor: 'rgba(15, 23, 42, 0.6)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: 'rgba(255, 255, 255, 0.25)',
+    },
+    fontControlText: {
+      fontSize: 30,
+      color: '#FFFFFF',
+      fontFamily: fonts.rajdhani.bold,
+    },
+    fontControlLabel: {
+      color: '#FFFFFF',
+      fontSize: 14,
+      fontFamily: fonts.rajdhani.medium,
+      letterSpacing: 1,
+    },
+    confettiContainer: {
+      ...StyleSheet.absoluteFillObject,
+    },
+    birthdayBanner: {
+      position: 'absolute',
+      bottom: 40,
+      left: 20,
+      right: 20,
+      alignItems: 'center',
+    },
+    birthdayText: {
+      fontSize: 18,
+      fontFamily: fonts.rajdhani.bold,
+      color: '#FFD166',
+      letterSpacing: 1,
+    },
+  });

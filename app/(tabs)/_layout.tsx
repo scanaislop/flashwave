@@ -1,9 +1,11 @@
 import { Tabs } from 'expo-router';
 import { Platform } from 'react-native';
-import { House, Mic, Settings, Users, Zap } from 'lucide-react-native';
+import { House, Mic, Settings, Users, Zap, Type } from 'lucide-react-native';
 import { fonts } from '@/constants/fonts';
+import { useTabBar } from '@/context/TabBarContext';
 
 export default function TabLayout() {
+  const { isTabBarVisible } = useTabBar();
   return (<Tabs
     screenOptions={{
       headerShown: false, tabBarStyle: {
@@ -12,7 +14,8 @@ export default function TabLayout() {
         borderTopColor: '#8B5CF6',
         height: Platform.OS === 'ios' ? 85 : 65,
         paddingBottom: Platform.OS === 'ios' ? 35 : 20,
-        paddingTop: 10
+        paddingTop: 10,
+        display: isTabBarVisible ? 'flex' : 'none'
       }, tabBarActiveTintColor: '#06FFA5', tabBarInactiveTintColor: '#64748B', tabBarLabelStyle: {
         fontSize: 12, fontFamily: fonts.medium
       }
@@ -39,6 +42,12 @@ export default function TabLayout() {
       name="party-sync"
       options={{
         title: 'Sync', tabBarIcon: ({ size, color }) => (<Users size={size} color={color} />)
+      }}
+    />
+    <Tabs.Screen
+      name="word"
+      options={{
+        title: 'Word', tabBarIcon: ({ size, color }) => (<Type size={size} color={color} />)
       }}
     />
     {/* <Tabs.Screen

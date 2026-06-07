@@ -1,4 +1,4 @@
-import { Mic, Zap, Users } from 'lucide-react-native';
+import { Mic, Zap, Users, Type } from 'lucide-react-native';
 
 export const modes = [
   {
@@ -24,6 +24,14 @@ export const modes = [
     icon: Users,
     color: '#8B5CF6',
     route: '/party-sync' as const,
+  },
+  {
+    id: 'word-visuals',
+    title: 'Word Visuals',
+    subtitle: 'Animated typography',
+    icon: Type,
+    color: '#F97316',
+    route: '/word' as const,
   },
   // {
   //   id: 'visual-effects',

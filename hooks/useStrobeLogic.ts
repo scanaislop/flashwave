@@ -77,7 +77,7 @@ export const useStrobeLogic = ({
           }
         }, Math.min(100, baseInterval / 2));
       } catch (error) {
-        console.log('Flashlight strobe error:', error);
+        console.error('Flashlight strobe error:', error);
       }
     }, baseInterval) as unknown as NodeJS.Timeout;
   }, [flashlightInterval, settings.strobeSpeed]);
@@ -114,7 +114,7 @@ export const useStrobeLogic = ({
       try {
         await Torch.switchState(false);
       } catch (error) {
-        console.log('Error turning off flashlight:', error);
+        console.error('Error turning off flashlight:', error);
       }
     }
   }, [flashlightInterval]);

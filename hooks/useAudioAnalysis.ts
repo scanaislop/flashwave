@@ -74,7 +74,7 @@ export const useAudioBeatDetection = (sensitivity: number, isListening: boolean)
         }
       }
     } catch (error) {
-      console.log('Error analyzing audio:', error);
+      console.error('Error analyzing audio:', error);
     }
 
     if (isListening && isAnalyzing) {

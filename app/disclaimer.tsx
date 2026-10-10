@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from "react";
 import { ScrollView, Text, View, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';

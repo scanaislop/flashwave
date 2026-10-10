@@ -1,4 +1,3 @@
-import React from 'react';
 import { Animated, TouchableOpacity, Platform } from 'react-native';
 import { Settings } from 'lucide-react-native';
 

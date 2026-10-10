@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from "react";
 import { Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';

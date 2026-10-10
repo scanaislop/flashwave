@@ -1,4 +1,3 @@
-import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { strobeStyles } from '@/components/styles/strobe';
 import { strobeEffectTypes } from '@/constants/color';

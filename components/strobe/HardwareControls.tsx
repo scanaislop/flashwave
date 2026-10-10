@@ -1,4 +1,3 @@
-import React from 'react';
 import { Platform, Text, TouchableOpacity, View } from 'react-native';
 import { Flashlight, FlashlightOff, Sun, SunDim } from 'lucide-react-native';
 import Slider from '@react-native-community/slider';

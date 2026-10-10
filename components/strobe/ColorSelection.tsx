@@ -1,4 +1,3 @@
-import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Zap } from 'lucide-react-native';

@@ -44,7 +44,7 @@ export const useHardwareManager = ({
         }
       }
     } catch (error) {
-      console.log('Could not check torch availability:', error);
+      console.error('Could not check torch availability:', error);
     }
 
     // Initialize brightness
@@ -55,7 +55,7 @@ export const useHardwareManager = ({
         setScreenBrightness(brightness);
       }
     } catch (error) {
-      console.log('Could not get brightness:', error);
+      console.error('Could not get brightness:', error);
     }
   }, [setTorchAvailable, setOriginalBrightness, setScreenBrightness]);
 
@@ -69,7 +69,7 @@ export const useHardwareManager = ({
       await Brightness.setBrightnessAsync(value);
       setScreenBrightness(value);
     } catch (error) {
-      console.log('Error setting brightness:', error);
+      console.error('Error setting brightness:', error);
     }
   }, [setScreenBrightness]);
 
@@ -102,14 +102,14 @@ export const useHardwareManager = ({
       try {
         await Brightness.setBrightnessAsync(originalBrightness);
       } catch (error) {
-        console.log('Error restoring brightness:', error);
+        console.error('Error restoring brightness:', error);
       }
       
       if (torchAvailable && Torch && Torch.switchState) {
         try {
           await Torch.switchState(false);
         } catch (error) {
-          console.log('Error turning off flashlight:', error);
+          console.error('Error turning off flashlight:', error);
         }
       }
     }

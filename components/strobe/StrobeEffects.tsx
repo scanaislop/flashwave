@@ -1,4 +1,3 @@
-import React from 'react';
 import { Animated, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { strobeStyles } from '@/components/styles/strobe';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Pause, Play } from 'lucide-react-native';
